@@ -469,3 +469,15 @@ body.mopen .pbtn{display:none!important}
   nav.solid{backdrop-filter:none;background:rgba(8,20,26,.94)}
   .hero .glow{display:none}
 }
+
+/* celular / toque: galeria em carrossel nativo (sem prender a tela, sem transformações por frame) */
+@media (pointer:coarse),(max-width:700px){
+  .gallery{height:auto!important;padding:90px 0 70px}
+  .gallery .stick{position:static;height:auto;overflow:visible;display:block}
+  .h-track{width:auto;overflow-x:auto;overflow-y:hidden;transform:none!important;will-change:auto;scroll-snap-type:x proximity;scroll-padding-inline:clamp(20px,5vw,80px);scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .h-track::-webkit-scrollbar{display:none}
+  .card{will-change:auto;transform:none!important;scroll-snap-align:start;height:auto;width:76vw;max-width:360px;aspect-ratio:4/5}
+  .card.wide{width:84vw;max-width:420px;aspect-ratio:5/4}
+  .card img{transform:none!important}
+  .h-track::after{content:"";flex:none;width:1px}
+}

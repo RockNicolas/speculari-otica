@@ -89,10 +89,22 @@ function setup(): () => void {
   const navLinks = $$<HTMLAnchorElement>("nav ul a");
   const secIds = ["sobre", "oferta", "colecao", "galeria", "servicos", "visita"];
 
+  /* celular/toque: a galeria vira um carrossel com deslize horizontal nativo (leve e sem travar) */
+  const touchMQ = matchMedia("(pointer:coarse),(max-width:700px)");
   const sizeGal = () => {
+    if (touchMQ.matches) {
+      gal.style.height = "";
+      track.style.transform = "";
+      return;
+    }
     gal.style.height = innerHeight + Math.max(0, track.scrollWidth - innerWidth) * 1.1 + "px";
   };
   sizeGal();
+  on(track, "scroll", () => {
+    if (!touchMQ.matches) return;
+    const m = track.scrollWidth - track.clientWidth;
+    hbar.style.transform = `scaleX(${m > 0 ? track.scrollLeft / m : 0})`;
+  }, { passive: true });
   on(window, "resize", sizeGal);
   on(window, "load", sizeGal);
 
@@ -257,12 +269,13 @@ function setup(): () => void {
     /* 1) leituras (um único cálculo de layout) */
     const max = document.documentElement.scrollHeight - vh;
     const parR = pars.map((el) => el.parentElement!.getBoundingClientRect());
-    const gr = gal.getBoundingClientRect();
-    const trackMax = Math.max(0, track.scrollWidth - vw);
+    const touchG = touchMQ.matches;
+    const gr = touchG ? null : gal.getBoundingClientRect();
+    const trackMax = touchG ? 0 : Math.max(0, track.scrollWidth - vw);
     const sobreTop = sobre.getBoundingClientRect().top;
     const scrubTop = scrubP ? scrubP.getBoundingClientRect().top : 0;
     const finTop = fin.getBoundingClientRect().top;
-    const cardR = cards.map((c) => c.getBoundingClientRect());
+    const cardR = touchG ? [] : cards.map((c) => c.getBoundingClientRect());
     let cs = "";
     secEls.forEach((e, i) => {
       if (e && e.getBoundingClientRect().top <= vh * 0.4) cs = secIds[i];
@@ -280,9 +293,11 @@ function setup(): () => void {
       const sp = Number(el.dataset.speed) || 0;
       el.style.transform = `translate3d(0,${(r.top + r.height / 2 - vh / 2) * sp * -1}px,0)`;
     });
-    const gp = clamp(-gr.top / (gal.offsetHeight - vh), 0, 1);
-    track.style.transform = `translate3d(${-gp * trackMax}px,0,0)`;
-    hbar.style.transform = `scaleX(${gp})`;
+    if (gr) {
+      const gp = clamp(-gr.top / (gal.offsetHeight - vh), 0, 1);
+      track.style.transform = `translate3d(${-gp * trackMax}px,0,0)`;
+      hbar.style.transform = `scaleX(${gp})`;
+    }
     const hp = clamp(y / vh, 0, 1);
     if (hp < 1 || heroTxt.style.opacity !== "0") {
       heroTxt.style.transform = `translate3d(0,${hp * 80}px,0)`;
@@ -299,7 +314,7 @@ function setup(): () => void {
     }
     cards.forEach((c, i) => {
       const r = cardR[i];
-      if (r.right < -200 || r.left > vw + 200) return;
+      if (!r || r.right < -200 || r.left > vw + 200) return;
       const p = (r.left + r.width / 2 - vw / 2) / vw;
       c.style.transform = `translateY(${Math.abs(p) * 26}px) rotate(${p * 3}deg)`;
       const im = c.querySelector("img");
