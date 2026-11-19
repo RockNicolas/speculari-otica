@@ -103,15 +103,15 @@ function setup(): () => void {
     const stk = $(".stk", sc)!,
       stage = $<SVGSVGElement>("#lstage")!,
       soft = $<SVGSVGElement>("#lsoft")!,
-      G = $("#lglasses")!,
+      gl = $<SVGSVGElement>("#lgl")!,
       lines = $$("#lline > *") as unknown as SVGGeometryElement[],
       thick = $("#lthick")!,
       fill = $("#lfill")!,
       shine = $("#lshine")!,
       screw = $("#lscrew")!,
       txt = $("#ltext")!,
+      tl = $("#ltl")!,
       full = $("#lfull")!,
-      lc = $$("#lclip .lc"),
       caps = $$(".lens-scene .cap"),
       dots = $$(".lens-scene .rail i"),
       pct = $(".lens-scene .pct"),
@@ -129,45 +129,60 @@ function setup(): () => void {
       sig = "",
       tall = false,
       K = 1,
-      VW = 1600;
-    /* viewBox e texto conforme o formato da tela: nada fica cortado no celular */
+      VW = 1600,
+      x0 = 0,
+      ppu = 1,
+      GW = 0,
+      GH = 0;
+    /* tamanho/viewBox/texto conforme o formato da tela: nada fica cortado no celular */
     const layout = () => {
       const w = stk.clientWidth || innerWidth,
         h = stk.clientHeight || innerHeight;
-      VW = Math.round((900 * w) / h);
+      VW = (900 * w) / h;
+      ppu = h / 900;
+      x0 = 800 - VW / 2;
       tall = VW < 1100;
       K = Math.min(1, VW / (tall ? 1150 : 1000));
       const fs = tall ? 64 : Math.round(132 * Math.min(1, VW / 1450));
-      const s2 = `${VW}|${fs}|${tall}`;
-      if (s2 === sig) return;
+      /* a armação é desenhada no tamanho máximo e só encolhe (fica sempre nítida) */
+      const u = ppu * K * 1.12;
+      GW = 920 * u;
+      GH = 270 * u;
+      gl.style.width = GW + "px";
+      gl.style.height = GH + "px";
+      const s2 = `${Math.round(VW)}|${Math.round(h)}|${fs}|${tall}`;
+      if (s2 === sig) {
+        last = -1;
+        return;
+      }
       sig = s2;
-      const vb = `${800 - VW / 2} 0 ${VW} 900`;
+      const vb = `${x0} 0 ${VW} 900`;
       stage.setAttribute("viewBox", vb);
       soft.setAttribute("viewBox", vb);
       const L: Array<[string, number]> = tall
         ? [["O mundo fica", 330], ["mais bonito", 410], ["quando você", 510], ["enxerga bem.", 590]]
         : [["O mundo fica mais bonito", 420], ["quando você enxerga bem.", 570]];
-      [soft, stage].forEach((sv) =>
-        $$<SVGGElement>(".tx", sv).forEach((g) => {
-          g.textContent = "";
-          L.forEach(([t, y], i) => {
-            const e = document.createElementNS(NS, "text");
-            e.setAttribute("x", "800");
-            e.setAttribute("y", String(y));
-            e.setAttribute("font-size", String(fs));
-            if (tall ? i > 1 : i === 1) {
-              e.setAttribute("font-style", "italic");
-              if (sv === stage) e.setAttribute("fill", "#d2b277");
-            }
-            e.textContent = t;
-            g.appendChild(e);
-          });
-        })
-      );
+      $$<SVGGElement>(".tx", sc).forEach((g) => {
+        g.textContent = "";
+        const blurred = soft.contains(g);
+        L.forEach(([t, y], i) => {
+          const e = document.createElementNS(NS, "text");
+          e.setAttribute("x", "800");
+          e.setAttribute("y", String(y));
+          e.setAttribute("font-size", String(fs));
+          if (tall ? i > 1 : i === 1) {
+            e.setAttribute("font-style", "italic");
+            if (!blurred) e.setAttribute("fill", "#d2b277");
+          }
+          e.textContent = t;
+          g.appendChild(e);
+        });
+      });
       last = -1;
     };
     layout();
     on(window, "resize", layout);
+    on(window, "load", layout);
     return () => {
       const r = sc.getBoundingClientRect(),
         tot = sc.offsetHeight - stk.clientHeight;
@@ -176,21 +191,23 @@ function setup(): () => void {
       if (Math.abs(p - last) < 0.0005) return;
       last = p;
       const turn = ease(range(p, 0, 0.3));
-      lines.forEach((l, i) => {
-        const k = ease(range(p, 0.02 + i * 0.03, 0.24 + i * 0.03));
-        l.style.strokeDashoffset = String(1000 * (1 - k));
-      });
+      if (p < 0.45) {
+        lines.forEach((l, i) => {
+          const k = ease(range(p, 0.02 + i * 0.03, 0.24 + i * 0.03));
+          l.style.strokeDashoffset = String(1000 * (1 - k));
+        });
+      }
       const th = ease(range(p, 0.28, 0.42));
-      put(thick, "opacity", String(th));
-      put(screw, "opacity", String(th));
-      lines.forEach((l) => (l.style.opacity = String(1 - th * 0.75)));
-      put(fill, "opacity", String(ease(range(p, 0.4, 0.5))));
-      shine.setAttribute("x", String(-900 + range(p, 0.44, 0.6) * 1300));
+      put(thick, "opacity", th.toFixed(3));
+      put(screw, "opacity", th.toFixed(3));
+      if (p < 0.45) lines.forEach((l) => (l.style.opacity = String(1 - th * 0.75)));
+      put(fill, "opacity", ease(range(p, 0.4, 0.5)).toFixed(3));
+      if (p > 0.4 && p < 0.65) shine.setAttribute("x", String(-900 + range(p, 0.44, 0.6) * 1300));
       const tx = ease(range(p, 0.56, 0.66)),
         end = ease(range(p, 0.94, 1));
-      put(txt, "opacity", String(tx));
-      soft.style.opacity = String(tx * (1 - end));
-      put(full, "opacity", String(end));
+      put(txt, "opacity", tx.toFixed(3));
+      soft.style.opacity = (tx * (1 - end)).toFixed(3);
+      put(full, "opacity", end.toFixed(3));
       const mv = range(p, 0.62, 0.94),
         sw = Math.sin(mv * Math.PI * 2);
       let x = 800,
@@ -207,9 +224,12 @@ function setup(): () => void {
       }
       rot += sw * -5;
       s *= 1 + end * 0.12;
-      const T = `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(2)}) scale(${(s * sx).toFixed(4)} ${s.toFixed(4)})`;
-      G.setAttribute("transform", T);
-      lc.forEach((e) => e.setAttribute("transform", T));
+      /* a armação só se move por transform (composição na GPU, sem redesenhar) */
+      const sX = (sx * s) / (K * 1.12),
+        sY = s / (K * 1.12);
+      gl.style.transform = `translate3d(${((x - x0) * ppu - GW / 2).toFixed(2)}px,${(y * ppu - GH / 2).toFixed(2)}px,0) rotate(${rot.toFixed(3)}deg) scale(${sX.toFixed(4)},${sY.toFixed(4)})`;
+      /* texto nítido dentro das lentes: transformação inversa da armação */
+      if (tx > 0) tl.setAttribute("transform", `scale(${(1 / (sx * s)).toFixed(4)} ${(1 / s).toFixed(4)}) rotate(${(-rot).toFixed(3)}) translate(${-x.toFixed(2)} ${-y.toFixed(2)})`);
       const c = p < 0.3 ? 0 : p < 0.48 ? 1 : p < 0.62 ? 2 : 3,
         cc = p > 0.01 ? c : -1;
       if (cc !== ci) {
@@ -230,6 +250,7 @@ function setup(): () => void {
   const secEls = secIds.map((id) => document.getElementById(id));
   let solid = false;
   const onScroll = () => {
+    lens();
     const y = scrollY,
       vh = innerHeight,
       vw = innerWidth;
@@ -285,7 +306,6 @@ function setup(): () => void {
       if (im) im.style.transform = `translate3d(${p * -60}px,0,0) scale(1.25)`;
     });
     navLinks.forEach((a) => a.classList.toggle("act", a.getAttribute("href") === "#" + cs));
-    lens();
   };
   let ticking = false;
   on(window, "scroll", () => {

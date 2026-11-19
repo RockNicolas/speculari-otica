@@ -239,8 +239,10 @@ nav ul a.act::after{transform:scaleX(1);transform-origin:left}
 .lens-scene{height:420vh;position:relative;background:radial-gradient(900px 600px at 50% 50%,#12313d,var(--ink) 70%)}
 .lens-scene .stk{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
 .lens-scene svg.stage{position:absolute;inset:0;width:100%;height:100%}
-.lens-scene .stage text{font-family:var(--serif);text-anchor:middle}
+.lens-scene .stage text,.lens-scene .gl text{font-family:var(--serif);text-anchor:middle}
 .lens-scene .stage.soft{filter:blur(7px);opacity:0;will-change:opacity;pointer-events:none}
+.lens-scene .gl{position:absolute;left:0;top:0;display:block;overflow:visible;pointer-events:none;will-change:transform;transform-origin:50% 50%}
+.lens-scene .stage:not(.soft){will-change:opacity}
 .lens-scene .caps{position:absolute;left:clamp(20px,5vw,80px);bottom:clamp(30px,7vh,70px);z-index:3}
 .lens-scene .cap{position:absolute;left:0;bottom:0;width:min(420px,80vw);opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
 .lens-scene .cap.on{opacity:1;transform:none}
