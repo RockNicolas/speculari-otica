@@ -227,44 +227,62 @@ function setup(): () => void {
   })();
 
   /* ---------- tudo que depende da posição do scroll ---------- */
+  const secEls = secIds.map((id) => document.getElementById(id));
+  let solid = false;
   const onScroll = () => {
     const y = scrollY,
-      max = document.documentElement.scrollHeight - innerHeight;
-    bar.style.transform = `scaleX(${max ? y / max : 0})`;
-    nav.classList.toggle("solid", y > 60);
-    pars.forEach((el) => {
-      const sp = Number(el.dataset.speed) || 0;
-      const r = el.parentElement!.getBoundingClientRect();
-      el.style.transform = `translate3d(0,${(r.top + r.height / 2 - innerHeight / 2) * sp * -1}px,0)`;
+      vh = innerHeight,
+      vw = innerWidth;
+    /* 1) leituras (um único cálculo de layout) */
+    const max = document.documentElement.scrollHeight - vh;
+    const parR = pars.map((el) => el.parentElement!.getBoundingClientRect());
+    const gr = gal.getBoundingClientRect();
+    const trackMax = Math.max(0, track.scrollWidth - vw);
+    const sobreTop = sobre.getBoundingClientRect().top;
+    const scrubTop = scrubP ? scrubP.getBoundingClientRect().top : 0;
+    const finTop = fin.getBoundingClientRect().top;
+    const cardR = cards.map((c) => c.getBoundingClientRect());
+    let cs = "";
+    secEls.forEach((e, i) => {
+      if (e && e.getBoundingClientRect().top <= vh * 0.4) cs = secIds[i];
     });
-    const gr = gal.getBoundingClientRect(),
-      tot = gal.offsetHeight - innerHeight;
-    const gp = clamp(-gr.top / tot, 0, 1);
-    track.style.transform = `translate3d(${-gp * Math.max(0, track.scrollWidth - innerWidth)}px,0,0)`;
+    /* 2) escritas */
+    bar.style.transform = `scaleX(${max ? y / max : 0})`;
+    const sd = y > 60;
+    if (sd !== solid) {
+      solid = sd;
+      nav.classList.toggle("solid", sd);
+    }
+    pars.forEach((el, i) => {
+      const r = parR[i];
+      if (r.bottom < -300 || r.top > vh + 300) return;
+      const sp = Number(el.dataset.speed) || 0;
+      el.style.transform = `translate3d(0,${(r.top + r.height / 2 - vh / 2) * sp * -1}px,0)`;
+    });
+    const gp = clamp(-gr.top / (gal.offsetHeight - vh), 0, 1);
+    track.style.transform = `translate3d(${-gp * trackMax}px,0,0)`;
     hbar.style.transform = `scaleX(${gp})`;
-    const hp = clamp(y / innerHeight, 0, 1);
-    heroTxt.style.transform = `translate3d(0,${hp * 80}px,0)`;
-    heroTxt.style.opacity = String(1 - hp * 1.15);
-    bgword.style.transform = `translate3d(${-sobre.getBoundingClientRect().top * 0.45 - 120}px,0,0)`;
+    const hp = clamp(y / vh, 0, 1);
+    if (hp < 1 || heroTxt.style.opacity !== "0") {
+      heroTxt.style.transform = `translate3d(0,${hp * 80}px,0)`;
+      heroTxt.style.opacity = String(Math.max(0, 1 - hp * 1.15));
+    }
+    if (sobreTop < vh * 1.5 && sobreTop > -vh * 2) bgword.style.transform = `translate3d(${-sobreTop * 0.45 - 120}px,0,0)`;
     if (scrubP && sw.length) {
-      const r = scrubP.getBoundingClientRect();
-      const n = Math.round(clamp((innerHeight * 0.85 - r.top) / (innerHeight * 0.45), 0, 1) * sw.length);
+      const n = Math.round(clamp((vh * 0.85 - scrubTop) / (vh * 0.45), 0, 1) * sw.length);
       sw.forEach((w, i) => w.classList.toggle("on", i < n));
     }
-    const fp = clamp((innerHeight - fin.getBoundingClientRect().top) / (innerHeight * 0.9), 0, 1);
-    fglass.forEach((e) => (e.style.strokeDashoffset = String(1000 * (1 - fp))));
-    cards.forEach((c) => {
-      const r = c.getBoundingClientRect();
-      if (r.right < -200 || r.left > innerWidth + 200) return;
-      const p = (r.left + r.width / 2 - innerWidth / 2) / innerWidth;
+    if (finTop < vh * 1.2) {
+      const fp = clamp((vh - finTop) / (vh * 0.9), 0, 1);
+      fglass.forEach((e) => (e.style.strokeDashoffset = String(1000 * (1 - fp))));
+    }
+    cards.forEach((c, i) => {
+      const r = cardR[i];
+      if (r.right < -200 || r.left > vw + 200) return;
+      const p = (r.left + r.width / 2 - vw / 2) / vw;
       c.style.transform = `translateY(${Math.abs(p) * 26}px) rotate(${p * 3}deg)`;
       const im = c.querySelector("img");
       if (im) im.style.transform = `translate3d(${p * -60}px,0,0) scale(1.25)`;
-    });
-    let cs = "";
-    secIds.forEach((id) => {
-      const e = document.getElementById(id);
-      if (e && e.getBoundingClientRect().top <= innerHeight * 0.4) cs = id;
     });
     navLinks.forEach((a) => a.classList.toggle("act", a.getAttribute("href") === "#" + cs));
     lens();
@@ -282,7 +300,14 @@ function setup(): () => void {
   onScroll();
 
   /* ---------- faixas de texto que aceleram com o scroll ---------- */
-  const mqs = $$(".marquee .row").map((r) => ({ r, x: 0, d: Number(r.parentElement!.dataset.dir) || -1, init: false }));
+  const mqs = $$(".marquee .row").map((r) => ({ r, host: r.parentElement as HTMLElement, x: 0, d: Number(r.parentElement!.dataset.dir) || -1, half: 0, init: false, vis: true }));
+  const measure = () => mqs.forEach((o) => (o.half = o.r.scrollWidth / 2));
+  measure();
+  on(window, "load", measure);
+  on(window, "resize", measure);
+  const mio = new IntersectionObserver((es) => es.forEach((e) => (mqs.find((o) => o.host === e.target)!.vis = e.isIntersecting)), { rootMargin: "100px" });
+  mqs.forEach((o) => mio.observe(o.host));
+  cleanups.push(() => mio.disconnect());
   let lastY = scrollY,
     vel = 0;
   loop(() => {
@@ -290,7 +315,9 @@ function setup(): () => void {
     lastY = scrollY;
     vel += (dy - vel) * 0.08;
     mqs.forEach((o) => {
-      const half = o.r.scrollWidth / 2;
+      if (!o.vis) return;
+      if (!o.half) o.half = o.r.scrollWidth / 2;
+      const half = o.half;
       if (!half) return;
       if (!o.init) {
         o.x = o.d > 0 ? -half / 2 : 0;
@@ -301,58 +328,80 @@ function setup(): () => void {
       if (o.x > 0) o.x -= half;
       o.r.style.transform = `translate3d(${o.x}px,0,0)`;
     });
-    document.documentElement.style.setProperty("--sk", clamp(vel * 0.045, -2.2, 2.2).toFixed(2) + "deg");
   });
 
   /* ---------- bolhas de luz do topo ---------- */
   const cv = $<HTMLCanvasElement>(".bokeh");
   if (cv && !reduced) {
     const g = cv.getContext("2d")!;
+    const touch = matchMedia("(pointer:coarse)").matches;
     let W = 0,
       H = 0,
       mx = 0.5;
-    type Dot = { x: number; y: number; r: number; vx: number; vy: number; c: string; a: number; p: number };
+    type Dot = { x: number; y: number; r: number; vx: number; vy: number; s: number; a: number; p: number };
     let dots: Dot[] = [];
+    /* um sprite por cor: desenhar uma imagem é bem mais barato que criar um degradê por bolha a cada frame */
+    const sprite = (c: string) => {
+      const o = document.createElement("canvas");
+      o.width = o.height = 128;
+      const x = o.getContext("2d")!;
+      const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+      gr.addColorStop(0, `rgba(${c},1)`);
+      gr.addColorStop(0.7, `rgba(${c},.5)`);
+      gr.addColorStop(1, `rgba(${c},0)`);
+      x.fillStyle = gr;
+      x.fillRect(0, 0, 128, 128);
+      return o;
+    };
+    const sprites = [sprite("210,178,119"), sprite("90,160,190")];
+    const draw = (t: number) => {
+      g.clearRect(0, 0, W, H);
+      dots.forEach((d) => {
+        g.globalAlpha = d.a * (0.7 + 0.3 * Math.sin(t / 1200 + d.p));
+        g.drawImage(sprites[d.s], d.x - d.r, d.y - d.r, d.r * 2, d.r * 2);
+      });
+      g.globalAlpha = 1;
+    };
     const rs = () => {
       W = cv.width = cv.offsetWidth;
       H = cv.height = cv.offsetHeight;
-      dots = Array.from({ length: 30 }, () => ({
+      dots = Array.from({ length: touch ? 10 : 30 }, () => ({
         x: Math.random() * W,
         y: Math.random() * H,
         r: 18 + Math.random() * 80,
         vx: (Math.random() - 0.5) * 0.3,
         vy: -0.12 - Math.random() * 0.35,
-        c: Math.random() < 0.55 ? "210,178,119" : "90,160,190",
+        s: Math.random() < 0.55 ? 0 : 1,
         a: 0.05 + Math.random() * 0.09,
         p: Math.random() * 6.28,
       }));
+      draw(0);
     };
     rs();
-    on(window, "resize", rs);
-    on(window, "mousemove", (e) => (mx = (e as MouseEvent).clientX / innerWidth));
-    loop((t) => {
-      if (scrollY > innerHeight * 1.2) return;
-      g.clearRect(0, 0, W, H);
-      dots.forEach((d) => {
-        d.x += d.vx + (mx - 0.5) * 0.4;
-        d.y += d.vy;
-        if (d.y < -d.r) {
-          d.y = H + d.r;
-          d.x = Math.random() * W;
-        }
-        if (d.x < -d.r) d.x = W + d.r;
-        if (d.x > W + d.r) d.x = -d.r;
-        const a = d.a * (0.7 + 0.3 * Math.sin(t / 1200 + d.p));
-        const gr = g.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.r);
-        gr.addColorStop(0, `rgba(${d.c},${a})`);
-        gr.addColorStop(0.7, `rgba(${d.c},${a * 0.5})`);
-        gr.addColorStop(1, `rgba(${d.c},0)`);
-        g.fillStyle = gr;
-        g.beginPath();
-        g.arc(d.x, d.y, d.r, 0, 6.283);
-        g.fill();
-      });
+    let rw = innerWidth;
+    on(window, "resize", () => {
+      if (innerWidth !== rw) {
+        rw = innerWidth;
+        rs();
+      }
     });
+    if (!touch) {
+      on(window, "mousemove", (e) => (mx = (e as MouseEvent).clientX / innerWidth));
+      loop((t) => {
+        if (scrollY > innerHeight * 1.2) return;
+        dots.forEach((d) => {
+          d.x += d.vx + (mx - 0.5) * 0.4;
+          d.y += d.vy;
+          if (d.y < -d.r) {
+            d.y = H + d.r;
+            d.x = Math.random() * W;
+          }
+          if (d.x < -d.r) d.x = W + d.r;
+          if (d.x > W + d.r) d.x = -d.r;
+        });
+        draw(t);
+      });
+    }
   }
 
   /* ---------- rolagem suave (desktop com mouse) ---------- */

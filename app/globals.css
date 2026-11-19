@@ -460,3 +460,10 @@ body.mopen .pbtn{display:none!important}
   .lens-scene{height:300vh;height:300svh}
   .lens-scene .stage.soft{filter:blur(4px)}
 }
+
+/* celular / toque: sem efeitos caros */
+@media (pointer:coarse),(max-width:700px){
+  .reveal{filter:none;transition:opacity .9s var(--ease),transform .9s var(--ease);transition-delay:var(--rd,0ms)}
+  nav.solid{backdrop-filter:none;background:rgba(8,20,26,.94)}
+  .hero .glow{display:none}
+}
