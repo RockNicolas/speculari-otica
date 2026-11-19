@@ -100,66 +100,128 @@ function setup(): () => void {
   const lens = (() => {
     const sc = $("#lente");
     if (!sc) return () => {};
-    const G = $("#lglasses")!,
+    const stk = $(".stk", sc)!,
+      stage = $<SVGSVGElement>("#lstage")!,
+      soft = $<SVGSVGElement>("#lsoft")!,
+      G = $("#lglasses")!,
       lines = $$("#lline > *") as unknown as SVGGeometryElement[],
       thick = $("#lthick")!,
       fill = $("#lfill")!,
       shine = $("#lshine")!,
       screw = $("#lscrew")!,
       txt = $("#ltext")!,
-      blurV = $("#lblurV")!,
+      full = $("#lfull")!,
       lc = $$("#lclip .lc"),
       caps = $$(".lens-scene .cap"),
       dots = $$(".lens-scene .rail i"),
-      pct = $(".lens-scene .pct")!,
+      pct = $(".lens-scene .pct"),
       hint = $(".lens-scene .hint2")!;
-    let last = -1;
-    // em tela em pé (celular) a cena inteira cabe na largura em vez de ser cortada
-    const stage = $("#lente svg.stage");
-    const fit = () => {
-      stage?.setAttribute("preserveAspectRatio", innerWidth / innerHeight < 1.3 ? "xMidYMid meet" : "xMidYMid slice");
+    const NS = "http://www.w3.org/2000/svg";
+    const put = (el: Element & { _v?: string }, k: string, v: string) => {
+      if (el._v !== k + v) {
+        el._v = k + v;
+        el.setAttribute(k, v);
+      }
+    };
+    let last = -1,
+      ci = -2,
+      pc = -1,
+      sig = "",
+      tall = false,
+      K = 1,
+      VW = 1600;
+    /* viewBox e texto conforme o formato da tela: nada fica cortado no celular */
+    const layout = () => {
+      const w = stk.clientWidth || innerWidth,
+        h = stk.clientHeight || innerHeight;
+      VW = Math.round((900 * w) / h);
+      tall = VW < 1100;
+      K = Math.min(1, VW / (tall ? 1150 : 1000));
+      const fs = tall ? 64 : Math.round(132 * Math.min(1, VW / 1450));
+      const s2 = `${VW}|${fs}|${tall}`;
+      if (s2 === sig) return;
+      sig = s2;
+      const vb = `${800 - VW / 2} 0 ${VW} 900`;
+      stage.setAttribute("viewBox", vb);
+      soft.setAttribute("viewBox", vb);
+      const L: Array<[string, number]> = tall
+        ? [["O mundo fica", 330], ["mais bonito", 410], ["quando você", 510], ["enxerga bem.", 590]]
+        : [["O mundo fica mais bonito", 420], ["quando você enxerga bem.", 570]];
+      [soft, stage].forEach((sv) =>
+        $$<SVGGElement>(".tx", sv).forEach((g) => {
+          g.textContent = "";
+          L.forEach(([t, y], i) => {
+            const e = document.createElementNS(NS, "text");
+            e.setAttribute("x", "800");
+            e.setAttribute("y", String(y));
+            e.setAttribute("font-size", String(fs));
+            if (tall ? i > 1 : i === 1) {
+              e.setAttribute("font-style", "italic");
+              if (sv === stage) e.setAttribute("fill", "#d2b277");
+            }
+            e.textContent = t;
+            g.appendChild(e);
+          });
+        })
+      );
       last = -1;
     };
-    fit();
-    on(window, "resize", fit);
+    layout();
+    on(window, "resize", layout);
     return () => {
       const r = sc.getBoundingClientRect(),
-        tot = sc.offsetHeight - innerHeight;
+        tot = sc.offsetHeight - stk.clientHeight;
       if (r.bottom < -50 || r.top > innerHeight + 50) return;
       const p = clamp(-r.top / tot, 0, 1);
       if (Math.abs(p - last) < 0.0005) return;
       last = p;
+      const turn = ease(range(p, 0, 0.3));
       lines.forEach((l, i) => {
         const k = ease(range(p, 0.02 + i * 0.03, 0.24 + i * 0.03));
         l.style.strokeDashoffset = String(1000 * (1 - k));
       });
-      const turn = ease(range(p, 0, 0.3));
       const th = ease(range(p, 0.28, 0.42));
-      thick.setAttribute("opacity", String(th));
-      screw.setAttribute("opacity", String(th));
+      put(thick, "opacity", String(th));
+      put(screw, "opacity", String(th));
       lines.forEach((l) => (l.style.opacity = String(1 - th * 0.75)));
-      fill.setAttribute("opacity", String(ease(range(p, 0.4, 0.5))));
+      put(fill, "opacity", String(ease(range(p, 0.4, 0.5))));
       shine.setAttribute("x", String(-900 + range(p, 0.44, 0.6) * 1300));
-      txt.setAttribute("opacity", String(ease(range(p, 0.56, 0.66))));
-      const mv = range(p, 0.62, 0.94);
+      const tx = ease(range(p, 0.56, 0.66)),
+        end = ease(range(p, 0.94, 1));
+      put(txt, "opacity", String(tx));
+      soft.style.opacity = String(tx * (1 - end));
+      put(full, "opacity", String(end));
+      const mv = range(p, 0.62, 0.94),
+        sw = Math.sin(mv * Math.PI * 2);
       let x = 800,
         y = 450,
         rot = (1 - turn) * -14,
-        s = 0.55 + 0.45 * ease(range(p, 0, 0.36));
+        s = (0.55 + 0.45 * ease(range(p, 0, 0.36))) * K;
       const sx = 0.25 + 0.75 * turn;
-      x += -Math.sin(mv * Math.PI * 2) * 300;
-      y += Math.sin(mv * Math.PI * 4) * -40 + (1 - turn) * 60;
-      rot += Math.sin(mv * Math.PI * 2) * -5;
-      const end = ease(range(p, 0.94, 1));
+      if (tall) {
+        x += -sw * Math.max(0, (VW - 880 * K * 1.12) / 2 - 6);
+        y += sw * -125 + (1 - turn) * 60 * K;
+      } else {
+        x += -sw * 300 * K;
+        y += Math.sin(mv * Math.PI * 4) * -40 * K + (1 - turn) * 60 * K;
+      }
+      rot += sw * -5;
       s *= 1 + end * 0.12;
-      const T = `translate(${x} ${y}) rotate(${rot}) scale(${s * sx} ${s})`;
+      const T = `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(2)}) scale(${(s * sx).toFixed(4)} ${s.toFixed(4)})`;
       G.setAttribute("transform", T);
       lc.forEach((e) => e.setAttribute("transform", T));
-      blurV.setAttribute("stdDeviation", String(9 * (1 - end)));
-      const ci = p < 0.3 ? 0 : p < 0.48 ? 1 : p < 0.62 ? 2 : 3;
-      caps.forEach((c, i) => c.classList.toggle("on", i === ci && p > 0.01));
-      dots.forEach((d, i) => d.classList.toggle("on", i === ci));
-      pct.textContent = Math.round(p * 100) + "%";
+      const c = p < 0.3 ? 0 : p < 0.48 ? 1 : p < 0.62 ? 2 : 3,
+        cc = p > 0.01 ? c : -1;
+      if (cc !== ci) {
+        ci = cc;
+        caps.forEach((e, i) => e.classList.toggle("on", i === cc));
+        dots.forEach((d, i) => d.classList.toggle("on", i === c));
+      }
+      const pr = Math.round(p * 100);
+      if (pr !== pc) {
+        pc = pr;
+        if (pct) pct.textContent = pr + "%";
+      }
       hint.style.opacity = String(1 - range(p, 0.02, 0.1));
     };
   })();

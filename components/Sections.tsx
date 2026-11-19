@@ -1,5 +1,5 @@
 import Split from "./Split";
-import { Arrow } from "./Icons";
+import { Arrow, Chat, Instagram } from "./Icons";
 import { CATEGORIES, itemsOf } from "@/lib/catalog";
 import { waLink, PHONE_LABEL, INSTAGRAM, ADDRESS, MAPS_EMBED, MAPS_DIR } from "@/lib/site";
 
@@ -236,19 +236,43 @@ export function Final() {
         </svg>
         <img className="lg reveal" src="/img/logo.jpg" alt="Speculari Ótica" loading="lazy" />
         <Split parts={["Seu próximo óculos começa ", { em: "aqui." }]} />
-        <a className="btn magnetic reveal" href={waLink()} target="_blank" rel="noopener">
-          <span>Iniciar atendimento</span>
-          <Arrow />
-        </a>
+        <div className="cta reveal">
+          <a className="btn magnetic" href={waLink()} target="_blank" rel="noopener">
+            <span>Iniciar atendimento</span>
+            <Arrow />
+          </a>
+          <a className="btn ghost magnetic" href={INSTAGRAM} target="_blank" rel="noopener">
+            <span>@speculariotica</span>
+            <Instagram />
+          </a>
+        </div>
       </section>
       <footer>
-        <span>© Speculari Ótica · {ADDRESS}</span>
-        <a href={INSTAGRAM} target="_blank" rel="noopener">
-          @speculariotica
-        </a>
-        <a href={waLink()} target="_blank" rel="noopener">
-          WhatsApp {PHONE_LABEL}
-        </a>
+        <div>
+          <b className="fh">Speculari Ótica</b>
+          {ADDRESS}
+          <br />
+          Seg a sex 9h–17h · Sáb 9h–12h
+        </div>
+        <div>
+          <b className="fh">Fale com a gente</b>
+          <a href={waLink()} target="_blank" rel="noopener">
+            <Chat size={14} />
+            <span>{PHONE_LABEL}</span>
+          </a>
+          <a href={INSTAGRAM} target="_blank" rel="noopener">
+            <Instagram size={14} />
+            <span>@speculariotica</span>
+          </a>
+        </div>
+        <div>
+          <b className="fh">Navegue</b>
+          <a href="#sobre">Sobre</a>
+          <a href="#colecao">Coleção</a>
+          <a href="#servicos">Serviços</a>
+          <a href="#visita">Visite</a>
+        </div>
+        <div className="copy">© Speculari Ótica · Todos os direitos reservados</div>
       </footer>
     </>
   );

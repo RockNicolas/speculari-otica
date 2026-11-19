@@ -18,11 +18,11 @@ export default function LensScene() {
     <section className="lens-scene" id="lente" aria-label="Animação da armação">
       <div className="stk">
         <div className="hint2">Continue rolando</div>
-        <svg className="stage" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <svg className="stage soft" id="lsoft" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <g className="tx" fill="rgba(243,238,230,.55)" />
+        </svg>
+        <svg className="stage" id="lstage" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <defs>
-            <filter id="lblur" x="-20%" y="-50%" width="140%" height="200%">
-              <feGaussianBlur id="lblurV" stdDeviation="9" />
-            </filter>
             <linearGradient id="acet" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stopColor="#2a1a12" />
               <stop offset=".35" stopColor="#6b3b1f" />
@@ -46,14 +46,8 @@ export default function LensScene() {
             <clipPath id="lclipLocal">{LENSES}</clipPath>
           </defs>
           <g id="ltext" opacity="0">
-            <g filter="url(#lblur)" fill="rgba(243,238,230,.45)">
-              <text className="bigtxt" x="800" y="420">O mundo fica mais bonito</text>
-              <text className="bigtxt" x="800" y="570" fontStyle="italic">quando você enxerga bem.</text>
-            </g>
-            <g clipPath="url(#lclip)" fill="#f3eee6">
-              <text className="bigtxt" x="800" y="420">O mundo fica mais bonito</text>
-              <text className="bigtxt" x="800" y="570" fontStyle="italic" fill="#d2b277">quando você enxerga bem.</text>
-            </g>
+            <g clipPath="url(#lclip)" fill="#f3eee6" className="tx" />
+            <g id="lfull" opacity="0" fill="#f3eee6" className="tx" />
           </g>
           <g id="lglasses" transform="translate(800 510) rotate(-14) scale(.14 .55)">
             <g id="lfill" opacity="0">
