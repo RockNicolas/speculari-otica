@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Speculari Ótica — óculos de grau e sol. Estilo, conforto e visão perfeita, com atendimento rápido e personalizado. Seg a Sex 9h às 17h, Sáb 9h às 12h.">
+<meta property="og:title" content="Speculari Ótica">
+<meta property="og:description" content="Óculos de grau e sol. Estilo, conforto e visão perfeita.">
+<meta property="og:image" content="img/promo.jpg">
+<meta name="theme-color" content="#08141a">
+<link rel="icon" href="img/logo.jpg">
+<link rel="preload" href="fonts/cormorant-garamond-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<title>Speculari Ótica — Estilo, conforto e visão perfeita</title>
+<style>
+@font-face{font-family:"Cormorant";font-weight:400;font-style:normal;src:url(fonts/cormorant-garamond-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant";font-weight:400;font-style:italic;src:url(fonts/cormorant-garamond-latin-400-italic.woff2) format("woff2")}
+@font-face{font-family:"Cormorant";font-weight:600;font-style:normal;src:url(fonts/cormorant-garamond-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant";font-weight:600;font-style:italic;src:url(fonts/cormorant-garamond-latin-600-italic.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:400;src:url(fonts/inter-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:500;src:url(fonts/inter-latin-500-normal.woff2) format("woff2")}
+
+:root{
+  --ink:#08141a; --ink2:#0d1f27; --teal:#1b4a5b; --teal2:#2f7088; --cream:#f3eee6; --gold:#d2b277;
+  --serif:"Cormorant",Georgia,serif; --sans:"Inter",system-ui,sans-serif;
+  --ease:cubic-bezier(.19,1,.22,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto;background:var(--ink)}
+body{font-family:var(--sans);color:var(--cream);background:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+body.loading{overflow:hidden}
+@media (pointer:fine){body{cursor:none}a,button{cursor:none}}
+
+/* progress + cursor */
+.progress{position:fixed;left:0;top:0;height:3px;width:100%;z-index:90;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,var(--teal2),var(--gold))}
+.cursor{position:fixed;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border:1px solid rgba(243,238,230,.7);border-radius:50%;pointer-events:none;z-index:200;transition:width .35s var(--ease),height .35s var(--ease),margin .35s var(--ease),background .3s;mix-blend-mode:difference;opacity:0}
+.cursor.on{opacity:1}
+.cursor.big{width:86px;height:86px;margin:-43px 0 0 -43px;background:rgba(243,238,230,.9)}
+.dot{position:fixed;left:0;top:0;width:6px;height:6px;margin:-3px 0 0 -3px;background:var(--cream);border-radius:50%;pointer-events:none;z-index:201;mix-blend-mode:difference;opacity:0}
+.dot.on{opacity:1}
+@media (pointer:coarse){.cursor,.dot{display:none}}
+
+/* loader */
+.loader{position:fixed;inset:0;z-index:300;background:var(--ink);display:grid;place-items:center;transition:transform 1.1s var(--ease) .1s}
+.loader.out{transform:translateY(-101%)}
+.loader .mark{position:relative;width:170px;height:170px}
+.loader svg{position:absolute;inset:-18px;width:calc(100% + 36px);height:calc(100% + 36px);transform:rotate(-90deg)}
+.loader circle{fill:none;stroke:var(--gold);stroke-width:1.5;stroke-dasharray:600;stroke-dashoffset:600;animation:draw 1.8s var(--ease) forwards}
+.loader img{width:100%;height:100%;border-radius:50%;opacity:0;transform:scale(.7);animation:pop 1s var(--ease) .5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{to{opacity:1;transform:scale(1)}}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:18px clamp(20px,4vw,56px);transition:background .5s,backdrop-filter .5s,padding .5s}
+nav.solid{background:rgba(8,20,26,.72);backdrop-filter:blur(14px);padding-top:10px;padding-bottom:10px}
+nav .brand{display:flex;align-items:center;gap:12px;font-family:var(--serif);font-size:22px;letter-spacing:.18em;text-transform:uppercase}
+nav .brand img{width:44px;height:44px;border-radius:50%}
+nav ul{display:flex;gap:34px;list-style:none;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+nav ul a{position:relative;padding:6px 0;opacity:.85}
+nav ul a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
+nav ul a:hover::after{transform:scaleX(1);transform-origin:left}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 30px;border-radius:99px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;background:var(--cream);color:var(--ink);position:relative;overflow:hidden;transition:color .4s,transform .3s;will-change:transform}
+.btn::before{content:"";position:absolute;inset:0;background:var(--gold);transform:translateY(101%);transition:transform .5s var(--ease)}
+.btn:hover::before{transform:translateY(0)}
+.btn span,.btn svg{position:relative;z-index:1}
+.btn.ghost{background:transparent;color:var(--cream);border:1px solid rgba(243,238,230,.4)}
+.btn.ghost:hover{color:var(--ink)}
+nav .btn{padding:11px 22px}
+@media (max-width:860px){nav ul{display:none}}
+
+/* hero */
+.hero{position:relative;min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;padding:130px clamp(20px,5vw,80px) 90px;overflow:hidden;background:radial-gradient(1200px 700px at 78% 30%,#1d5468 0%,rgba(27,74,91,.0) 60%),linear-gradient(180deg,#0b1d25,#08141a)}
+.hero .glow{position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(210,178,119,.28),transparent 65%);left:0;top:0;pointer-events:none;filter:blur(20px);transform:translate(40vw,30vh);transition:opacity .6s}
+.bgglass{position:absolute;left:50%;top:52%;width:1500px;max-width:none;transform:translate(-50%,-50%);opacity:.5;pointer-events:none}
+.bgglass path,.bgglass circle,.bgglass ellipse{fill:none;stroke:rgba(243,238,230,.16);stroke-width:1.4;stroke-dasharray:2200;stroke-dashoffset:2200;animation:draw2 5s var(--ease) 1.2s forwards}
+@keyframes draw2{to{stroke-dashoffset:0}}
+.eyebrow{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:16px;margin-bottom:28px;opacity:0;transform:translateY(14px);transition:all 1s var(--ease) 2.4s}
+.eyebrow::before{content:"";width:48px;height:1px;background:var(--gold)}
+body.ready .eyebrow{opacity:1;transform:none}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(48px,7.4vw,118px);line-height:.96;letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--gold)}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.12em;margin-bottom:-.12em}
+.w>span{display:inline-block;transform:translateY(110%) rotate(4deg);transition:transform 1.2s var(--ease);transition-delay:calc(var(--d,0)*1ms)}
+.in .w>span,body.ready .hero .w>span{transform:none}
+body.ready .hero .w>span{transition-delay:calc(var(--d,0)*1ms + 2.5s)}
+.hero p.lead{margin-top:34px;max-width:480px;font-size:18px;line-height:1.7;color:rgba(243,238,230,.78);opacity:0;transform:translateY(20px);transition:all 1.2s var(--ease) 3.1s}
+.hero .cta{margin-top:40px;display:flex;gap:16px;flex-wrap:wrap;opacity:0;transform:translateY(20px);transition:all 1.2s var(--ease) 3.3s}
+body.ready .hero p.lead,body.ready .hero .cta{opacity:1;transform:none}
+
+.collage{position:relative;height:min(78vh,720px)}
+.collage figure{position:absolute;overflow:hidden;border-radius:6px;box-shadow:0 40px 80px -20px rgba(0,0,0,.7);opacity:0;transition:opacity 1.4s var(--ease),transform 1.6s var(--ease)}
+.collage figure img{width:100%;height:100%;object-fit:cover}
+.c1{width:44%;height:62%;left:6%;top:8%;transform:translateY(80px) rotate(-6deg)}
+.c2{width:46%;height:46%;right:0;top:0;transform:translateY(80px) rotate(5deg)}
+.c3{width:42%;height:38%;right:8%;bottom:2%;transform:translateY(80px) rotate(-3deg)}
+body.ready .c1{opacity:1;transform:rotate(-6deg);transition-delay:2.7s}
+body.ready .c2{opacity:1;transform:rotate(5deg);transition-delay:2.9s}
+body.ready .c3{opacity:1;transform:rotate(-3deg);transition-delay:3.1s}
+.par{will-change:transform}
+.seal{position:absolute;left:34%;top:46%;width:170px;height:170px;z-index:5;display:grid;place-items:center;opacity:0;transform:scale(.4);transition:all 1.4s var(--ease) 3.3s}
+body.ready .seal{opacity:1;transform:none}
+.seal img{width:96px;height:96px;border-radius:50%;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.seal svg{position:absolute;inset:0;width:100%;height:100%;animation:spin 22s linear infinite}
+.seal text{font-size:12.4px;letter-spacing:.27em;fill:var(--cream);font-family:var(--sans);text-transform:uppercase}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scroll{position:absolute;left:clamp(20px,5vw,80px);bottom:34px;display:flex;align-items:center;gap:14px;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(243,238,230,.6)}
+.scroll i{width:1px;height:46px;background:rgba(243,238,230,.25);position:relative;overflow:hidden}
+.scroll i::after{content:"";position:absolute;left:0;top:-50%;width:1px;height:50%;background:var(--gold);animation:drip 2s infinite}
+@keyframes drip{to{top:120%}}
+@media (max-width:900px){.hero{grid-template-columns:1fr;padding-top:120px}.collage{height:60vh;margin-top:50px}}
+
+/* marquee */
+.marquee{background:var(--cream);color:var(--ink);overflow:hidden;padding:26px 0;border-block:1px solid var(--gold)}
+.marquee .row{display:flex;width:max-content;will-change:transform}
+.marquee span{font-family:var(--serif);font-size:clamp(28px,3.6vw,52px);font-style:italic;white-space:nowrap;padding-right:48px;display:flex;align-items:center;gap:48px}
+.marquee span::after{content:"✦";font-style:normal;font-size:.5em;color:var(--teal)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* sections */
+section{position:relative}
+.pad{padding:clamp(90px,13vw,190px) clamp(20px,5vw,80px)}
+.kicker{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:26px;display:flex;align-items:center;gap:16px}
+.kicker::before{content:"";width:48px;height:1px;background:var(--gold)}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(40px,5.6vw,88px);line-height:1;letter-spacing:-.01em}
+h2 em{font-style:italic;color:var(--gold)}
+.reveal{opacity:0;transform:translateY(50px);filter:blur(10px);transition:opacity 1.2s var(--ease),transform 1.2s var(--ease),filter 1.4s var(--ease);transition-delay:var(--rd,0ms)}
+.reveal.in{opacity:1;transform:none;filter:none}
+.btn.reveal.in{transition:color .4s,transform .3s var(--ease)}
+
+/* about / pillars */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,7vw,120px);align-items:end}
+.about p{font-size:18px;line-height:1.8;color:rgba(243,238,230,.74);max-width:520px}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:90px;background:rgba(243,238,230,.14);border:1px solid rgba(243,238,230,.14)}
+.pillar{background:var(--ink);padding:44px 36px 50px;position:relative;overflow:hidden;transition:background .6s}
+.pillar::before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,var(--teal),transparent 70%);opacity:0;transition:opacity .6s}
+.pillar:hover::before{opacity:1}
+.pillar>*{position:relative}
+.pillar .n{font-family:var(--serif);font-size:64px;color:var(--gold);font-style:italic;line-height:1}
+.pillar h3{font-family:var(--serif);font-weight:400;font-size:34px;margin:22px 0 12px}
+.pillar p{font-size:15px;line-height:1.7;color:rgba(243,238,230,.7)}
+@media (max-width:900px){.about,.pillars{grid-template-columns:1fr}}
+
+/* promo */
+.promo{background:linear-gradient(180deg,var(--ink),#0b2029 50%,var(--ink));overflow:hidden}
+.promo .grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(40px,7vw,120px);align-items:center}
+.promo .frame{position:relative;max-width:480px;margin:auto}
+.promo .frame img{border-radius:6px;box-shadow:0 50px 100px -30px #000}
+.promo .frame::before{content:"";position:absolute;inset:-20px 20px 20px -20px;border:1px solid var(--gold);border-radius:6px;z-index:-1;transition:transform 1s var(--ease)}
+.promo .frame:hover::before{transform:translate(-12px,-12px)}
+.big2{font-family:var(--serif);font-size:clamp(70px,11vw,170px);line-height:.95;font-style:italic;padding:0 .12em .08em 0;color:transparent;background:linear-gradient(100deg,#d2b277 30%,#fff3d4 45%,#d2b277 60%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;animation:shim 5s linear infinite}
+@keyframes shim{from{background-position:100% 0}to{background-position:0 0}}
+.stats{display:flex;gap:clamp(24px,4vw,64px);margin-top:50px;flex-wrap:wrap}
+.stat b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(44px,5vw,76px);line-height:1}
+.stat small{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:rgba(243,238,230,.6)}
+.stat{border-top:1px solid rgba(243,238,230,.25);padding-top:18px;min-width:130px}
+@media (max-width:900px){.promo .grid{grid-template-columns:1fr}}
+
+/* horizontal gallery */
+.gallery{height:400vh}
+.gallery .stick{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.gallery .head{padding:0 clamp(20px,5vw,80px);margin-bottom:34px;display:flex;justify-content:space-between;align-items:end;gap:20px}
+.h-track{display:flex;gap:28px;padding:0 clamp(20px,5vw,80px);width:max-content;will-change:transform}
+.card{position:relative;height:min(56vh,520px);aspect-ratio:4/5;border-radius:6px;overflow:hidden;flex:none;background:var(--teal)}
+.card.wide{aspect-ratio:5/4}
+.card{will-change:transform}
+.card img{width:100%;height:100%;object-fit:cover;transform:scale(1.25);transition:filter .6s}
+.card:hover img{filter:brightness(1.12) saturate(1.15)}
+.card figcaption{position:absolute;left:0;right:0;bottom:0;padding:60px 22px 20px;background:linear-gradient(transparent,rgba(8,20,26,.9));font-family:var(--serif);font-size:26px;font-style:italic}
+.card .num{position:absolute;top:16px;left:18px;font-size:12px;letter-spacing:.3em;color:var(--cream);opacity:.8}
+.h-bar{margin:34px clamp(20px,5vw,80px) 0;height:2px;background:rgba(243,238,230,.18)}
+.h-bar i{display:block;height:100%;background:var(--gold);transform-origin:left;transform:scaleX(0)}
+
+/* services */
+.services .list{margin-top:80px;border-top:1px solid rgba(243,238,230,.2)}
+.srv{display:grid;grid-template-columns:90px 1fr 1.1fr 60px;gap:30px;align-items:center;padding:38px 10px;border-bottom:1px solid rgba(243,238,230,.2);position:relative;overflow:hidden;transition:padding .6s var(--ease)}
+.srv::before{content:"";position:absolute;inset:0;background:var(--teal);transform:scaleY(0);transform-origin:bottom;transition:transform .7s var(--ease);z-index:0}
+.srv:hover::before{transform:scaleY(1)}
+.srv:hover{padding-left:34px}
+.srv>*{position:relative;z-index:1}
+.srv .i{font-family:var(--serif);font-style:italic;color:var(--gold);font-size:28px}
+.srv h3{font-family:var(--serif);font-weight:400;font-size:clamp(30px,3.6vw,54px)}
+.srv p{color:rgba(243,238,230,.72);line-height:1.7;font-size:15px}
+.srv .go{width:54px;height:54px;border:1px solid rgba(243,238,230,.4);border-radius:50%;display:grid;place-items:center;transition:transform .6s var(--ease),background .4s,color .4s}
+.srv:hover .go{transform:rotate(-45deg);background:var(--cream);color:var(--ink)}
+@media (max-width:800px){.srv{grid-template-columns:50px 1fr}.srv p,.srv .go{display:none}}
+
+/* hours */
+.visit{background:var(--cream);color:var(--ink)}
+.visit .kicker{color:var(--teal)}.visit .kicker::before{background:var(--teal)}
+.visit h2 em{color:var(--teal)}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,80px);margin-top:70px}
+.hours{background:var(--ink);color:var(--cream);padding:46px;border-radius:8px;position:relative;overflow:hidden}
+.hours .status{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:28px}
+.hours .status i{width:10px;height:10px;border-radius:50%;background:#f1b24a;position:relative}
+.hours .status.open i{background:#5be08a}
+.hours .status i::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid currentColor;opacity:.6;animation:ping 2s infinite}
+.hours .status.open{color:#5be08a}.hours .status{color:#f1b24a}
+@keyframes ping{from{transform:scale(.6);opacity:.9}to{transform:scale(1.8);opacity:0}}
+.hours dl div{display:flex;justify-content:space-between;padding:20px 0;border-bottom:1px solid rgba(243,238,230,.16);font-family:var(--serif);font-size:30px}
+.hours dl div:last-child{border:0}
+.hours dd{color:var(--gold);font-style:italic}
+.map{position:relative;border-radius:8px;overflow:hidden;min-height:380px;background:#cfe0e6}
+.map svg.grid{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;left:52%;top:46%;transform:translate(-50%,-100%);width:56px;animation:bob 2.2s ease-in-out infinite}
+.pin::after{content:"";position:absolute;left:50%;bottom:-8px;width:34px;height:10px;margin-left:-17px;border-radius:50%;background:rgba(0,0,0,.25);filter:blur(3px);animation:shadow 2.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translate(-50%,-112%)}}
+@keyframes shadow{50%{transform:scale(.7);opacity:.5}}
+.map .tag{position:absolute;left:20px;bottom:20px;right:20px;background:var(--ink);color:var(--cream);border-radius:8px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.map .tag b{font-family:var(--serif);font-weight:400;font-size:26px;display:block}
+.map .tag small{color:rgba(243,238,230,.65)}
+@media (max-width:900px){.vgrid{grid-template-columns:1fr}}
+
+/* cta */
+.final{text-align:center;overflow:hidden;background:radial-gradient(900px 500px at 50% 100%,#1d5468,transparent 70%),var(--ink)}
+.final h2{font-size:clamp(46px,8vw,130px);max-width:1100px;margin:0 auto}
+.final .cta{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:50px}
+.final .cta .btn{margin:0}
+.final .cta .btn.ghost::before{background:var(--cream)}
+.final img.lg{width:130px;height:130px;border-radius:50%;margin:0 auto 40px}
+footer{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:28px 40px;align-items:start;padding:44px clamp(20px,5vw,80px) 40px;padding-right:max(clamp(20px,5vw,80px),96px);border-top:1px solid rgba(243,238,230,.14);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(243,238,230,.6);line-height:1.8}
+footer .fh{display:block;font-weight:500;color:var(--cream);margin-bottom:6px;letter-spacing:.2em}
+footer a{display:flex;align-items:center;gap:9px;width:fit-content;transition:color .3s}
+footer a:hover{color:var(--gold)}
+footer svg{flex:none}
+footer .copy{grid-column:1/-1;border-top:1px solid rgba(243,238,230,.08);padding-top:20px;font-size:11px;letter-spacing:.12em;color:rgba(243,238,230,.4)}
+@media (max-width:800px){footer{grid-template-columns:1fr 1fr;padding-right:clamp(20px,5vw,80px);padding-bottom:96px}footer>div:first-child{grid-column:1/-1}}
+@media (max-width:420px){footer{grid-template-columns:1fr}}
+
+
+/* extras: more motion */
+.stat b i{font-style:normal}
+#sobre{overflow:hidden}
+.bgword{position:absolute;left:0;top:18%;font-family:var(--serif);font-size:24vw;line-height:1;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(243,238,230,.1);pointer-events:none;user-select:none;will-change:transform}
+.about,.pillars{position:relative;z-index:1}
+.scrub .sw{opacity:.16;transition:opacity .35s}
+.scrub .sw.on{opacity:1}
+.bokeh{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.wipe{clip-path:inset(0 0 100% 0);transition:clip-path 1.6s var(--ease) .15s}
+.wipe.in{clip-path:inset(0)}
+.marquee.alt{background:var(--ink);border:0;padding:46px 0}
+.marquee.alt span{font-style:normal;text-transform:uppercase;font-size:clamp(64px,11vw,170px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(243,238,230,.5);padding-right:60px;gap:60px}
+.marquee.alt span::after{color:var(--gold);-webkit-text-stroke:0}
+nav ul a.act{opacity:1;color:var(--gold)}
+nav ul a.act::after{transform:scaleX(1);transform-origin:left}
+.srv.reveal:nth-child(odd){transform:translateX(-80px)}
+.srv.reveal:nth-child(even){transform:translateX(80px)}
+.srv.reveal.in{transform:none}
+.final{position:relative}
+.fglass{position:absolute;left:50%;top:50%;width:1400px;max-width:none;transform:translate(-50%,-50%);pointer-events:none}
+.fglass *{fill:none;stroke:rgba(210,178,119,.45);stroke-width:1.5;stroke-dasharray:1000;stroke-dashoffset:1000}
+.final>*:not(svg){position:relative;z-index:1}
+.seal img{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.07)}}
+
+
+/* ===== cena da armação (scroll) ===== */
+.lens-scene{height:420vh;position:relative;background:radial-gradient(900px 600px at 50% 50%,#12313d,var(--ink) 70%)}
+.lens-scene .stk{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.lens-scene svg.stage{position:absolute;inset:0;width:100%;height:100%}
+.lens-scene .stage text{font-family:var(--serif);text-anchor:middle}
+.lens-scene .stage.soft{filter:blur(7px);opacity:0;will-change:opacity;pointer-events:none}
+.lens-scene .caps{position:absolute;left:clamp(20px,5vw,80px);bottom:clamp(30px,7vh,70px);z-index:3}
+.lens-scene .cap{position:absolute;left:0;bottom:0;width:min(420px,80vw);opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.lens-scene .cap.on{opacity:1;transform:none}
+.lens-scene .cap small{display:block;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.lens-scene .cap b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(30px,3.4vw,48px);line-height:1.05}
+.lens-scene .cap p{margin-top:10px;color:rgba(243,238,230,.7);line-height:1.6;font-size:15px}
+.lens-scene .pct{position:absolute;right:clamp(20px,5vw,80px);bottom:clamp(30px,7vh,70px);z-index:3;font-family:var(--serif);font-style:italic;font-size:clamp(46px,6vw,90px);color:rgba(243,238,230,.18);line-height:1}
+.lens-scene .rail{position:absolute;right:clamp(20px,5vw,80px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;z-index:3}
+.lens-scene .rail i{width:8px;height:8px;border-radius:50%;border:1px solid rgba(243,238,230,.5);transition:background .4s,transform .4s}
+.lens-scene .rail i.on{background:var(--gold);border-color:var(--gold);transform:scale(1.4)}
+.lens-scene .hint2{position:absolute;left:50%;top:clamp(90px,14vh,140px);transform:translateX(-50%);font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:rgba(243,238,230,.55);z-index:3;transition:opacity .5s}
+
+
+/* cena: celular */
+@media (max-width:700px){
+  .lens-scene{height:300vh;height:300svh}
+  .lens-scene .stage.soft{filter:blur(4px)}
+  .lens-scene .pct,.lens-scene .rail{display:none}
+  .lens-scene .caps{right:clamp(20px,5vw,80px)}
+  .lens-scene .cap{width:auto;right:0}
+  .lens-scene .cap b{font-size:30px}
+  .lens-scene .cap p{font-size:14px}
+}
+/* mobile */
+html,body{overflow-x:hidden;max-width:100%}
+.hero,.marquee,section,footer{max-width:100vw;overflow-x:clip}
+@media (max-width:600px){
+  nav{padding:12px 16px}
+  nav .brand{font-size:16px;gap:9px;letter-spacing:.14em}
+  nav .brand img{width:34px;height:34px}
+  nav .btn{padding:9px 14px;font-size:10px;letter-spacing:.1em}
+  .hero{padding:110px 20px 80px}
+  .wa-float{right:16px;bottom:16px;width:54px;height:54px}
+}
+/* coleção */
+.wa-float{position:fixed;right:22px;bottom:22px;z-index:85;width:60px;height:60px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);transition:transform .4s var(--ease)}
+.wa-float::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid #25d366;animation:ping 2.2s infinite}
+.wa-float:hover{transform:scale(1.1)}
+body.mopen .wa-float{display:none}
+.panel .catrow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(243,238,230,.1)}
+.panel .catf{display:flex;flex-direction:column;gap:6px}
+.panel .catrow .act{flex-direction:row}
+.panel .catf input{padding:8px 10px!important}
+.panel .b2:disabled{opacity:.35}
+body.mopen .pbtn{display:none!important}
+#colecao .clead{margin-top:22px;color:rgba(243,238,230,.7);font-size:17px}
+.ctiles{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:60px}
+.ctile{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:0;padding:0;background:var(--teal);color:var(--cream);text-align:left;font:inherit}
+.ctile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.68);transition:transform 1.3s var(--ease),filter .6s}
+.ctile:hover img{transform:scale(1.1);filter:brightness(.9)}
+.ctile .ct{position:absolute;left:0;right:0;bottom:0;padding:26px 24px;background:linear-gradient(transparent,rgba(8,20,26,.95))}
+.ctile small{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold)}
+.ctile h3{font-family:var(--serif);font-weight:400;font-size:clamp(26px,2.4vw,36px);line-height:1.05;margin:8px 0 6px}
+.ctile p{font-size:14px;color:rgba(243,238,230,.7)}
+.ctile .go{display:inline-block;margin-top:16px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;padding:9px 16px;border-radius:99px;border:1px solid rgba(243,238,230,.45);transform:translateY(10px);opacity:.75;transition:all .5s var(--ease)}
+.ctile:hover .go{transform:none;opacity:1;background:var(--cream);color:var(--ink)}
+@media (max-width:900px){.ctiles{grid-template-columns:1fr 1fr}}
+.card[data-cat]{cursor:pointer}
+.card[data-cat]::after{content:"Ver opções +";position:absolute;top:14px;right:14px;padding:8px 14px;border-radius:99px;background:rgba(243,238,230,.92);color:var(--ink);font:500 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;opacity:0;transform:translateY(-8px);transition:all .5s var(--ease)}
+.card[data-cat]:hover::after{opacity:1;transform:none}
+.cmodal{position:fixed;inset:0;z-index:230;visibility:hidden;transition:visibility 0s .9s}
+.cmodal.open{visibility:visible;transition:none}
+.cm-bg{position:absolute;inset:0;background:rgba(4,10,13,.72);backdrop-filter:blur(8px);opacity:0;transition:opacity .5s}
+.cmodal.open .cm-bg{opacity:1}
+.cm-box{position:absolute;inset:clamp(0px,3vw,40px);background:#0d1f27;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;clip-path:circle(0 at var(--ox,50%) var(--oy,50%));transition:clip-path .9s var(--ease);box-shadow:0 40px 120px rgba(0,0,0,.6)}
+.cmodal.open .cm-box{clip-path:circle(150% at var(--ox,50%) var(--oy,50%))}
+.cm-head{display:flex;justify-content:space-between;align-items:center;padding:26px clamp(20px,3vw,40px) 10px}
+.cm-head small{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+.cm-head h3{font-family:var(--serif);font-weight:400;font-size:clamp(30px,3.2vw,48px);margin-top:4px}
+.cm-x{width:48px;height:48px;border-radius:50%;border:1px solid rgba(243,238,230,.35);background:none;color:var(--cream);font-size:26px;transition:transform .5s var(--ease),background .3s}
+.cm-x:hover{transform:rotate(90deg);background:rgba(243,238,230,.1)}
+.cm-tabs{display:flex;gap:10px;padding:8px clamp(20px,3vw,40px) 16px;overflow-x:auto;border-bottom:1px solid rgba(243,238,230,.12)}
+.cm-tabs button{flex:none;padding:10px 18px;border-radius:99px;border:1px solid rgba(243,238,230,.25);background:none;color:rgba(243,238,230,.75);font:500 13px var(--sans);transition:all .3s}
+.cm-tabs button.on{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.cm-grid{flex:1;overflow:auto;padding:26px clamp(20px,3vw,40px) 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px;align-content:start;overscroll-behavior:contain}
+.cm-item{border:0;padding:0;background:#08141a;color:var(--cream);text-align:left;font:inherit;border-radius:10px;overflow:hidden;animation:cmIn .8s var(--ease) both;animation-delay:calc(var(--i)*80ms + .25s)}
+@keyframes cmIn{from{opacity:0;transform:translateY(34px) scale(.95)}}
+.cm-iw{aspect-ratio:4/5;overflow:hidden}
+.cm-iw img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s var(--ease)}
+.cm-item:hover .cm-iw img{transform:scale(1.08)}
+.cm-cap{padding:16px 16px 18px;display:flex;flex-direction:column;gap:6px}
+.cm-cap b{font-family:var(--serif);font-weight:400;font-size:24px}
+.cm-cap span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.cm-empty{color:rgba(243,238,230,.6)}
+.cm-detail{position:absolute;inset:0;display:grid;grid-template-columns:1.1fr .9fr;background:#0d1f27;opacity:0;visibility:hidden;transition:opacity .5s,visibility 0s .5s}
+.cmodal.detail .cm-detail{opacity:1;visibility:visible;transition:opacity .5s}
+.cm-dimg{overflow:hidden;background:#08141a}
+.cm-dimg img{width:100%;height:100%;object-fit:cover;animation:dimg 1.2s var(--ease) both}
+@keyframes dimg{from{transform:scale(1.18);filter:blur(12px);opacity:.3}}
+.cm-dtxt{padding:clamp(28px,4vw,64px);display:flex;flex-direction:column;justify-content:center;gap:16px;animation:dtxt .9s var(--ease) .15s both}
+@keyframes dtxt{from{opacity:0;transform:translateX(40px)}}
+.cm-back{align-self:flex-start;background:none;border:0;color:rgba(243,238,230,.7);font:500 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;margin-bottom:20px}
+.cm-back:hover{color:var(--gold)}
+.cm-dcat{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+.cm-dname{font-family:var(--serif);font-weight:400;font-size:clamp(40px,4.4vw,68px);line-height:1}
+.cm-ddesc{color:rgba(243,238,230,.75);font-size:17px;line-height:1.7;max-width:440px}
+.cm-cta{align-self:flex-start;margin-top:14px}
+.cm-nav{display:flex;align-items:center;gap:16px;margin-top:30px;font-size:13px;letter-spacing:.2em;color:rgba(243,238,230,.6)}
+.cm-nav button{width:46px;height:46px;border-radius:50%;border:1px solid rgba(243,238,230,.35);background:none;color:var(--cream);font-size:22px;transition:background .3s,color .3s}
+.cm-nav button:hover{background:var(--cream);color:var(--ink)}
+@media (max-width:800px){.cm-detail{grid-template-columns:1fr;grid-template-rows:45% 55%;overflow:auto}.cm-box{inset:0;border-radius:0}}
+.panel select{width:100%;background:#08141a;color:var(--cream);border:1px solid rgba(243,238,230,.22);border-radius:8px;padding:11px 12px;font:400 14px var(--sans)}
+.panel input[type=file]{font-size:13px;color:rgba(243,238,230,.75)}
+
+/* painel */
+.panel.full{width:100vw;border:0}
+.panel.full>*{width:100%;max-width:760px;margin-left:auto;margin-right:auto}
+.panel.full .pbody{flex:1}
+.panel.full .ph{padding-top:40px}
+.panel.full .ph h3{font-size:40px}
+.pillars,.services .list,.promo .grid,.vgrid{transform:skewY(var(--sk,0deg));will-change:transform}
+.pbtn{position:fixed;right:22px;bottom:22px;z-index:240;display:none;align-items:center;gap:8px;padding:13px 20px;border-radius:99px;background:var(--gold);color:var(--ink);font:500 13px var(--sans);letter-spacing:.08em;border:0;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.pbtn.show{display:inline-flex}
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);z-index:250;background:#0d1f27;color:var(--cream);border-left:1px solid rgba(243,238,230,.16);transform:translateX(102%);transition:transform .6s var(--ease);display:flex;flex-direction:column;font-family:var(--sans);filter:none}
+.panel.open{transform:none;box-shadow:-30px 0 80px rgba(0,0,0,.5)}
+.panel,.panel *{cursor:auto!important}
+.panel button,.panel label,.pbtn{cursor:pointer!important}
+body.pop .cursor,body.pop .dot{display:none}
+body.pop,body.pop *{cursor:auto!important}
+body.pop a,body.pop button,body.pop label,body.pop select{cursor:pointer!important}
+.panel .ph{display:flex;justify-content:space-between;align-items:center;padding:22px 24px 14px}
+.panel .ph h3{font-family:var(--serif);font-weight:400;font-size:28px}
+.panel .ph button{background:none;border:0;color:var(--cream);font-size:26px;line-height:1}
+.panel .hint{padding:0 24px 14px;font-size:13px;color:rgba(243,238,230,.6);line-height:1.5}
+.panel .tabs{display:flex;gap:6px;padding:0 24px;border-bottom:1px solid rgba(243,238,230,.14)}
+.panel .tabs button{background:none;border:0;border-bottom:2px solid transparent;color:rgba(243,238,230,.6);padding:12px 6px;margin-right:14px;font:500 13px var(--sans);letter-spacing:.1em;text-transform:uppercase}
+.panel .tabs button.on{color:var(--gold);border-color:var(--gold)}
+.panel .pbody{flex:1;overflow:auto;padding:8px 24px 24px;overscroll-behavior:contain}
+.panel h4{font:500 11px var(--sans);letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin:22px 0 10px}
+.panel .slot{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(243,238,230,.1)}
+.panel .slot img{width:64px;height:64px;object-fit:cover;border-radius:6px;background:var(--teal)}
+.panel .slot b{display:block;font:500 14px var(--sans);margin-bottom:3px}
+.panel .slot small{color:rgba(243,238,230,.55);font-size:12px}
+.panel .act{display:flex;flex-direction:column;gap:6px}
+.panel .b2{display:inline-block;text-align:center;padding:8px 14px;border-radius:99px;background:var(--cream);color:var(--ink);font:500 12px var(--sans);border:0}
+.panel .b2.ghost{background:transparent;color:var(--cream);border:1px solid rgba(243,238,230,.35)}
+.panel label.fld{display:block;margin:14px 0 6px;font-size:12px;letter-spacing:.08em;color:rgba(243,238,230,.7)}
+.panel input[type=text],.panel input[type=number],.panel textarea{width:100%;background:#08141a;color:var(--cream);border:1px solid rgba(243,238,230,.22);border-radius:8px;padding:11px 12px;font:400 14px var(--sans)}
+.panel textarea{min-height:90px;resize:vertical}
+.panel .row2{display:grid;grid-template-columns:1fr 90px;gap:10px}
+.panel .sw2{display:flex;align-items:center;gap:12px;padding:14px;background:#08141a;border-radius:8px;font-size:14px;margin-top:10px}
+.panel .btns{display:flex;gap:10px;margin-top:22px}
+.panel .pfoot{padding:14px 24px;border-top:1px solid rgba(243,238,230,.14);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#5be08a}
+.panel .pfoot.err{color:#ff8f7a}
+.panel .pfoot.busy{color:var(--gold)}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body class="loading">
+<div class="progress"></div>
+<a class="wa-float" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener" aria-label="Falar no WhatsApp"><svg viewBox="0 0 32 32" width="30" height="30" fill="#fff"><path d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.5.7 4.8 2 6.8L3.2 29l6.8-2a12.7 12.7 0 0 0 6 1.5c7 0 12.7-5.6 12.7-12.6S23 3 16 3zm0 23.1c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4 1.2 1.2-3.9-.3-.4a10.4 10.4 0 0 1-1.6-5.6C5.5 9.9 10.2 5.3 16 5.3s10.5 4.6 10.5 10.3S21.8 26.1 16 26.1zm5.8-7.7c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6.3-.5c.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.4c.2.2 2.4 3.6 5.8 5 .8.4 1.4.6 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.3.2-1.5-.1-.1-.3-.2-.6-.3z"/></svg></a><div class="cursor"></div><div class="dot"></div>
+
+<div class="loader"><div class="mark"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="95"/></svg><img src="img/logo.jpg" alt="Speculari Ótica"></div></div>
+
+<nav>
+  <a class="brand" href="#top"><img src="img/logo.jpg" alt="">Speculari</a>
+  <ul><li><a href="#sobre">Sobre</a></li><li><a href="#oferta">Oferta</a></li><li><a href="#colecao">Coleção</a></li><li><a href="#galeria">Galeria</a></li><li><a href="#servicos">Serviços</a></li><li><a href="#visita">Visite</a></li></ul>
+  <a class="btn magnetic" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><span>Atendimento</span></a>
+</nav>
+
+<header class="hero" id="top">
+  <div class="glow"></div>
+  <canvas class="bokeh"></canvas>
+  <svg class="bgglass par" data-speed="-.08" viewBox="0 0 1500 520" aria-hidden="true">
+    <circle cx="430" cy="270" r="205"/><circle cx="1070" cy="270" r="205"/>
+    <path d="M635 250 C 700 190, 800 190, 865 250"/><path d="M225 240 L 40 175"/><path d="M1275 240 L 1460 175"/>
+    <ellipse cx="430" cy="270" rx="150" ry="150"/><ellipse cx="1070" cy="270" rx="150" ry="150"/>
+  </svg>
+  <div class="txt" style="position:relative;z-index:2">
+    <div class="eyebrow">Óculos de grau e sol</div>
+    <h1 data-split="hero">Estilo, conforto e <em>visão perfeita.</em></h1>
+    <p class="lead">Armações escolhidas a dedo, lentes de qualidade e um atendimento rápido e personalizado — do exame à retirada dos seus óculos.</p>
+    <div class="cta">
+      <a class="btn magnetic" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><span>Falar com a Speculari</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn ghost magnetic" href="#galeria"><span>Ver a loja</span></a>
+    </div>
+  </div>
+  <div class="collage" style="z-index:2">
+    <figure class="c1 par" data-speed=".05"><img data-slot="hero1" src="img/armacoes.jpg" alt="Armações"></figure>
+    <figure class="c2 par" data-speed="-.04"><img data-slot="hero2" src="img/loja.jpg" alt="Vitrine"></figure>
+    <figure class="c3 par" data-speed=".09"><img data-slot="hero3" src="img/mao.jpg" alt="Óculos"></figure>
+    <div class="seal par" data-speed="-.02">
+      <svg viewBox="0 0 170 170"><defs><path id="ring" d="M85,85 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"/></defs><text><textPath href="#ring">Speculari Ótica ✦ Grau &amp; Sol ✦ Speculari Ótica ✦ Grau &amp; Sol ✦</textPath></text></svg>
+      <img src="img/logo.jpg" alt="">
+    </div>
+  </div>
+  <div class="scroll"><i></i>Role para explorar</div>
+</header>
+
+<div class="marquee"><div class="row">
+  <span>Óculos de grau</span><span>Óculos de sol</span><span>Lentes Zeiss</span><span>Atendimento personalizado</span><span>Estilo e conforto</span>
+  <span>Óculos de grau</span><span>Óculos de sol</span><span>Lentes Zeiss</span><span>Atendimento personalizado</span><span>Estilo e conforto</span>
+</div></div>
+
+<section class="lens-scene" id="lente" aria-label="Animação da armação">
+  <div class="stk">
+    <div class="hint2">Continue rolando</div>
+    <svg class="stage soft" id="lsoft" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g class="tx" fill="rgba(243,238,230,.55)"></g></svg>
+    <svg class="stage" id="lstage" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="acet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a1a12"/><stop offset=".35" stop-color="#6b3b1f"/><stop offset=".55" stop-color="#1a110c"/><stop offset=".8" stop-color="#7a4524"/><stop offset="1" stop-color="#20140e"/></linearGradient>
+        <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9fd3e6" stop-opacity=".16"/><stop offset="1" stop-color="#2f7088" stop-opacity=".1"/></linearGradient>
+        <linearGradient id="shine" gradientUnits="userSpaceOnUse" x1="-600" y1="0" x2="-300" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <clipPath id="lclip"><rect class="lc" x="-345" y="-115" width="300" height="225" rx="100"/><rect class="lc" x="45" y="-115" width="300" height="225" rx="100"/></clipPath>
+        <clipPath id="lclipLocal"><rect x="-345" y="-115" width="300" height="225" rx="100"/><rect x="45" y="-115" width="300" height="225" rx="100"/></clipPath>
+      </defs>
+      <g id="ltext" opacity="0">
+        <g clip-path="url(#lclip)" fill="#f3eee6" class="tx"></g>
+        <g id="lfull" opacity="0" fill="#f3eee6" class="tx"></g>
+      </g>
+      <g id="lglasses">
+        <g id="lfill" opacity="0">
+          <rect x="-345" y="-115" width="300" height="225" rx="100" fill="url(#glass)"/>
+          <rect x="45" y="-115" width="300" height="225" rx="100" fill="url(#glass)"/>
+          <rect id="lshine" x="-400" y="-160" width="800" height="320" fill="url(#shine)" clip-path="url(#lclipLocal)"/>
+        </g>
+        <g id="lthick" opacity="0" fill="none" stroke="url(#acet)" stroke-width="22" stroke-linecap="round">
+          <rect x="-345" y="-115" width="300" height="225" rx="100"/><rect x="45" y="-115" width="300" height="225" rx="100"/>
+          <path d="M-45 -40 Q0 -78 45 -40"/><path id="tl2" d="M-345 -70 L-440 -92"/><path id="tr2" d="M345 -70 L440 -92"/>
+        </g>
+        <g id="lline" fill="none" stroke="#d2b277" stroke-width="3" stroke-linecap="round">
+          <rect pathLength="1000" x="-345" y="-115" width="300" height="225" rx="100"/><rect pathLength="1000" x="45" y="-115" width="300" height="225" rx="100"/>
+          <path pathLength="1000" d="M-45 -40 Q0 -78 45 -40"/><path pathLength="1000" d="M-345 -70 L-440 -92"/><path pathLength="1000" d="M345 -70 L440 -92"/>
+        </g>
+        <g id="lscrew" fill="#d2b277" opacity="0"><circle cx="-330" cy="-70" r="5"/><circle cx="330" cy="-70" r="5"/></g>
+      </g>
+    </svg>
+    <div class="caps">
+      <div class="cap" data-c="0"><small>01 — A armação</small><b>Tudo começa no desenho certo.</b><p>Formatos pensados para o seu rosto, do clássico ao ousado.</p></div>
+      <div class="cap" data-c="1"><small>02 — O acabamento</small><b>Acetato, cor e personalidade.</b><p>Materiais leves e resistentes, com acabamento de quem cuida dos detalhes.</p></div>
+      <div class="cap" data-c="2"><small>03 — As lentes</small><b>Lentes de qualidade.</b><p>Tecnologia que deixa a visão confortável o dia inteiro.</p></div>
+      <div class="cap" data-c="3"><small>04 — Visão perfeita</small><b>Agora é só enxergar bem.</b><p>Olhe através das lentes: o que estava embaçado fica nítido.</p></div>
+    </div>
+    <div class="rail"><i></i><i></i><i></i><i></i></div>
+    <div class="pct">0%</div>
+  </div>
+</section>
+
+<section class="pad" id="sobre">
+  <div class="bgword" aria-hidden="true">Speculari ótica</div>
+  <div class="about">
+    <div><div class="kicker reveal">A Speculari</div><h2 data-split>Enxergar bem também é <em>questão de estilo.</em></h2></div>
+    <p class="reveal scrub" style="--rd:200ms">Aqui, escolher óculos é uma experiência leve: você experimenta, compara e sai com uma armação que combina com o seu rosto e com o seu dia a dia. Atendimento próximo, sem pressa e com a qualidade de quem entende de visão.</p>
+  </div>
+  <div class="pillars">
+    <div class="pillar reveal"><div class="n">01</div><h3>Estilo</h3><p>Armações de grau e solares para todos os gostos, de clássicas a ousadas.</p></div>
+    <div class="pillar reveal" style="--rd:150ms"><div class="n">02</div><h3>Conforto</h3><p>Ajuste feito com cuidado para você esquecer que está usando.</p></div>
+    <div class="pillar reveal" style="--rd:300ms"><div class="n">03</div><h3>Visão perfeita</h3><p>Lentes de qualidade e atendimento rápido e personalizado.</p></div>
+  </div>
+</section>
+
+<div class="marquee alt" data-dir="1"><div class="row">
+  <span>Grau</span><span>Sol</span><span>Estilo</span><span>Conforto</span><span>Visão perfeita</span>
+  <span>Grau</span><span>Sol</span><span>Estilo</span><span>Conforto</span><span>Visão perfeita</span>
+</div></div>
+
+<section class="pad promo" id="oferta">
+  <div class="grid">
+    <div class="frame reveal"><img class="par wipe" data-slot="promo" data-speed=".03" src="img/promo.jpg" alt="Compre 1 leve 2"></div>
+    <div>
+      <div class="kicker reveal">Oferta da casa</div>
+      <div class="big2 reveal" data-k="promoTitle">Compre 1, leve 2.</div>
+      <p class="reveal" data-k="promoText" style="margin-top:26px;color:rgba(243,238,230,.74);font-size:18px;line-height:1.7;max-width:460px">Óculos de grau ou sol, com qualidade e estilo. Aproveite para renovar o visual — ou presentear alguém.</p>
+      <div class="stats">
+        <div class="stat reveal"><b><span data-count="10" data-k="s1n">0</span><i data-k="s1u">x</i></b><small data-k="s1l">R$ 49,90 · completo</small></div>
+        <div class="stat reveal" style="--rd:150ms"><b><span data-count="50" data-k="s2n">0</span><i data-k="s2u">%</i></b><small data-k="s2l">Lentes Zeiss</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="colecao">
+  <div class="kicker reveal">Coleção</div>
+  <h2 data-split>Escolha por <em>estilo.</em></h2>
+  <p class="reveal clead">Clique numa categoria para ver as opções.</p>
+  <div class="ctiles"></div>
+</section>
+
+<section class="gallery" id="galeria">
+  <div class="stick">
+    <div class="head"><div><div class="kicker">Por dentro da loja</div><h2>Detalhes que <em>fazem diferença.</em></h2></div><div class="kicker" style="margin:0">Role →</div></div>
+    <div class="h-track">
+      <figure class="card" data-cat="promocoes"><span class="num">01</span><img data-slot="g1" src="img/promo.jpg" alt=""><figcaption>Compre 1, leve 2</figcaption></figure>
+      <figure class="card wide" data-cat="loja"><span class="num">02</span><img data-slot="g2" src="img/loja.jpg" alt=""><figcaption>Acho chique enxergar bem.</figcaption></figure>
+      <figure class="card" data-cat="grau"><span class="num">03</span><img data-slot="g3" src="img/armacoes.jpg" alt=""><figcaption>Armações para cada estilo</figcaption></figure>
+      <figure class="card wide" data-cat="grau"><span class="num">04</span><img data-slot="g4" src="img/close.jpg" alt=""><figcaption>Acabamento em detalhes</figcaption></figure>
+      <figure class="card wide" data-cat="grau"><span class="num">05</span><img data-slot="g5" src="img/mao.jpg" alt=""><figcaption>Leveza no rosto</figcaption></figure>
+      <figure class="card wide" data-cat="loja"><span class="num">06</span><img data-slot="g6" src="img/dono.jpg" alt=""><figcaption>Atendimento de perto</figcaption></figure>
+    </div>
+    <div class="h-bar"><i></i></div>
+  </div>
+</section>
+
+<section class="pad services" id="servicos">
+  <div class="kicker reveal">O que fazemos</div>
+  <h2 data-split>Tudo para o seu <em>olhar.</em></h2>
+  <div class="list">
+    <a class="srv reveal" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><div class="i">i.</div><h3>Óculos de grau</h3><p>Armações com lentes sob medida, com orientação para escolher o que combina com você.</p><div class="go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+    <a class="srv reveal" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><div class="i">ii.</div><h3>Óculos de sol</h3><p>Proteção e presença: modelos para o dia a dia, para viagem e para qualquer ocasião.</p><div class="go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+    <a class="srv reveal" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><div class="i">iii.</div><h3>Lentes de qualidade</h3><p>Opções com tecnologia Zeiss para quem quer a melhor experiência visual.</p><div class="go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+    <a class="srv reveal" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><div class="i">iv.</div><h3>Convênios</h3><p>Trabalhamos com convênios. Fale com a gente e confira as condições.</p><div class="go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+  </div>
+</section>
+
+<section class="pad visit" id="visita">
+  <div class="kicker reveal">Visite a Speculari</div>
+  <h2 data-split>Venha experimentar <em>sem pressa.</em></h2>
+  <div class="vgrid">
+    <div class="hours reveal">
+      <div class="status" id="status"><i></i><span>—</span></div>
+      <dl>
+        <div><dt>Segunda a sexta</dt><dd>9h – 17h</dd></div>
+        <div><dt>Sábado</dt><dd>9h – 12h</dd></div>
+        <div><dt>Domingo</dt><dd>Fechado</dd></div>
+      </dl>
+    </div>
+    <div class="map reveal" style="--rd:150ms">
+      <svg class="grid" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice"><rect width="600" height="420" fill="#cfe0e6"/>
+        <g stroke="#fff" stroke-width="14" fill="none" stroke-linecap="round"><path d="M-20 120 L620 70"/><path d="M-20 330 L620 290"/><path d="M160 -20 L210 440"/><path d="M430 -20 L400 440"/></g>
+        <g stroke="#e6eff2" stroke-width="6" fill="none"><path d="M-20 220 L620 190"/><path d="M300 -20 L310 440"/><path d="M-20 20 L620 10"/></g>
+        <rect x="230" y="130" width="90" height="60" fill="#b8d0d8"/><rect x="450" y="210" width="110" height="70" fill="#b8d0d8"/><rect x="40" y="220" width="90" height="60" fill="#b8d0d8"/></svg>
+      <svg class="pin" viewBox="0 0 56 72"><path d="M28 70C28 70 4 44 4 27a24 24 0 0 1 48 0C52 44 28 70 28 70z" fill="#1b4a5b"/><circle cx="28" cy="27" r="11" fill="#f3eee6"/></svg>
+      <div class="tag"><div><b>Speculari Ótica</b><small>WhatsApp (85) 99640-9091</small></div><a class="btn magnetic" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><span>Pedir localização</span></a></div>
+    </div>
+  </div>
+</section>
+
+<section class="pad final">
+  <svg class="fglass" viewBox="0 0 1200 400" aria-hidden="true"><circle cx="330" cy="210" r="150"/><circle cx="870" cy="210" r="150"/><path d="M480 190 C 540 140, 660 140, 720 190"/><path d="M180 190 L40 130"/><path d="M1020 190 L1160 130"/></svg>
+  <img class="lg reveal" src="img/logo.jpg" alt="">
+  <h2 data-split>Seu próximo óculos começa <em>aqui.</em></h2>
+  <div class="cta reveal">
+    <a class="btn magnetic" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><span>Iniciar atendimento</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <a class="btn ghost magnetic" href="https://www.instagram.com/speculariotica" target="_blank" rel="noopener"><span>@speculariotica</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg></a>
+  </div>
+</section>
+<footer>
+  <div><b class="fh">Speculari Ótica</b>Av. Pontes Vieira, 2250, Loja 10<br>Fortaleza · CE<br>Seg a sex 9h–17h · Sáb 9h–12h</div>
+  <div><b class="fh">Fale com a gente</b>
+    <a href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21l1.6-4.7A8.5 8.5 0 1 1 8 19.5L3 21z"/></svg><span>(85) 99640-9091</span></a>
+    <a href="https://www.instagram.com/speculariotica" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg><span>@speculariotica</span></a></div>
+  <div><b class="fh">Navegue</b><a href="#sobre">Sobre</a><a href="#colecao">Coleção</a><a href="#servicos">Serviços</a><a href="#visita">Visite</a></div>
+  <div class="copy">© Speculari Ótica · Todos os direitos reservados</div>
+</footer>
+
+<script>
+(function(){
+const $=(s,c=document)=>c.querySelector(s),$$=(s,c=document)=>[...c.querySelectorAll(s)];
+/* split text */
+$$('[data-split]').forEach(el=>{
+  const walk=(node)=>{[...node.childNodes].forEach(n=>{
+    if(n.nodeType===3){const f=document.createDocumentFragment();n.textContent.split(/(\s+)/).forEach(t=>{if(!t.trim()){f.append(t);return}const w=document.createElement('span');w.className='w';const s=document.createElement('span');s.textContent=t;s.style.setProperty('--i',0);w.append(s);f.append(w)});n.replaceWith(f)}
+    else if(n.nodeType===1){walk(n)}})};
+  walk(el);
+  $$('.w>span',el).forEach((s,i)=>{s.style.setProperty('--d',i*80)});
+});
+/* loader */
+addEventListener('load',()=>setTimeout(()=>{$('.loader').classList.add('out');document.body.classList.remove('loading');setTimeout(()=>document.body.classList.add('ready'),350)},2300));
+/* reveal */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');$$('.wipe',e.target).forEach(w=>w.classList.add('in'));io.unobserve(e.target);if(e.target.querySelector&&e.target.querySelector('[data-count]'))count(e.target);}}),{threshold:.18});
+$$('.reveal,.wipe,[data-split]:not(h1)').forEach(el=>io.observe(el));
+function count(root){root.classList.add('counted');$$('[data-count]',root).forEach(el=>{const to=+el.dataset.count,t0=performance.now();const tick=t=>{const p=Math.min(1,(t-t0)/1600);el.textContent=Math.round(to*(1-Math.pow(1-p,4)));if(p<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)})}
+$$('.stat').forEach(s=>{new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){count(s);o.disconnect()}}),{threshold:.6}).observe(s)});
+/* gallery height */
+const gal=$('#galeria'),track=$('.h-track');
+const sizeGal=()=>{gal.style.height=(innerHeight+Math.max(0,track.scrollWidth-innerWidth)*1.1)+'px'};
+addEventListener('resize',sizeGal);addEventListener('load',sizeGal);sizeGal();
+/* extras */
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const ghost=$('.bgword'),sobre=$('#sobre'),fin=$('.final'),heroTxt=$('.hero .txt');
+const scrubP=$('.scrub');let sw=[];
+if(scrubP){scrubP.innerHTML=scrubP.textContent.trim().split(/\s+/).map(w=>'<span class="sw">'+w+'</span>').join(' ');sw=$$('.sw',scrubP)}
+const navLinks=$$('nav ul a'),secIds=['sobre','oferta','colecao','galeria','servicos','visita'];
+/* marquees driven by scroll speed */
+const mqs=$$('.marquee .row').map(r=>({r,x:0,d:+r.parentElement.dataset.dir||-1,init:false}));
+let lastY=scrollY,vel=0;
+(function mqLoop(){const dy=scrollY-lastY;lastY=scrollY;vel+=(dy-vel)*.08;
+  mqs.forEach(o=>{const half=o.r.scrollWidth/2;if(!half)return;if(!o.init){o.x=o.d>0?-half/2:0;o.init=true}
+    o.x+=o.d*(.7+Math.min(14,Math.abs(vel))*.55);if(o.x<=-half)o.x+=half;if(o.x>0)o.x-=half;o.r.style.transform='translate3d('+o.x+'px,0,0)'});
+  document.documentElement.style.setProperty('--sk',clamp(vel*.045,-2.2,2.2).toFixed(2)+'deg');
+  requestAnimationFrame(mqLoop)})();
+/* bokeh */
+(function(){const cv=$('.bokeh');if(!cv)return;const g=cv.getContext('2d');let W,H,dots=[],mx=.5;
+  function rs(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;dots=Array.from({length:30},()=>({x:Math.random()*W,y:Math.random()*H,r:18+Math.random()*80,vx:(Math.random()-.5)*.3,vy:-.12-Math.random()*.35,c:Math.random()<.55?'210,178,119':'90,160,190',a:.05+Math.random()*.09,p:Math.random()*6.28}))}
+  rs();addEventListener('resize',rs);addEventListener('mousemove',e=>{mx=e.clientX/innerWidth});
+  (function draw(t){if(scrollY<innerHeight*1.2){g.clearRect(0,0,W,H);dots.forEach(d=>{d.x+=d.vx+(mx-.5)*.4;d.y+=d.vy;if(d.y<-d.r){d.y=H+d.r;d.x=Math.random()*W}if(d.x<-d.r)d.x=W+d.r;if(d.x>W+d.r)d.x=-d.r;
+    const a=d.a*(.7+.3*Math.sin(t/1200+d.p));const gr=g.createRadialGradient(d.x,d.y,0,d.x,d.y,d.r);gr.addColorStop(0,'rgba('+d.c+','+a+')');gr.addColorStop(.7,'rgba('+d.c+','+a*.5+')');gr.addColorStop(1,'rgba('+d.c+',0)');g.fillStyle=gr;g.beginPath();g.arc(d.x,d.y,d.r,0,6.283);g.fill()})}
+    requestAnimationFrame(draw)})(0)})();
+/* rolagem suave (desktop) */
+if(matchMedia('(pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
+  let tgt=scrollY,cur=scrollY,raf=0;
+  const maxY=()=>document.documentElement.scrollHeight-innerHeight;
+  const tick=()=>{cur+=(tgt-cur)*.085;if(Math.abs(tgt-cur)<.4)cur=tgt;window.scrollTo(0,cur);raf=(cur!==tgt)?requestAnimationFrame(tick):0};
+  const go=y=>{tgt=clamp(y,0,maxY());if(!raf)raf=requestAnimationFrame(tick)};
+  addEventListener('wheel',e=>{if(e.ctrlKey||e.target.closest('.panel')||e.target.closest('.cmodal')||document.body.classList.contains('mopen'))return;e.preventDefault();go(tgt+e.deltaY*(e.deltaMode===1?32:1))},{passive:false});
+  addEventListener('scroll',()=>{if(!raf&&Math.abs(scrollY-cur)>1){tgt=cur=scrollY}},{passive:true});
+  $$('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const id=a.getAttribute('href');if(id==='#painel'||id==='#')return;const t=$(id);if(!t)return;e.preventDefault();go(t.offsetTop)}));
+}
+/* scroll */
+const nav=$('nav'),bar=$('.progress'),hbar=$('.h-bar i');
+let ticking=false;
+function onScroll(){
+  const y=scrollY,max=document.documentElement.scrollHeight-innerHeight;
+  bar.style.transform=`scaleX(${max?y/max:0})`;
+  nav.classList.toggle('solid',y>60);
+  $$('.par').forEach(el=>{const sp=+el.dataset.speed||0;const r=el.parentElement.getBoundingClientRect();const off=(r.top+r.height/2-innerHeight/2)*sp*-1;el.style.transform=`translate3d(0,${off}px,0)`});
+  const gr=gal.getBoundingClientRect(),tot=gal.offsetHeight-innerHeight;
+  const p=Math.min(1,Math.max(0,-gr.top/tot));
+  const mx=Math.max(0,track.scrollWidth-innerWidth);
+  track.style.transform=`translate3d(${-p*mx}px,0,0)`;hbar.style.transform=`scaleX(${p})`;
+  const hp=clamp(scrollY/innerHeight,0,1);
+  heroTxt.style.transform='translate3d(0,'+(hp*80)+'px,0)';heroTxt.style.opacity=String(1-hp*1.15);
+  const sr=sobre.getBoundingClientRect();ghost.style.transform='translate3d('+(-sr.top*.45-120)+'px,0,0)';
+  if(sw.length){const r=scrubP.getBoundingClientRect();const n=Math.round(clamp((innerHeight*.85-r.top)/(innerHeight*.45),0,1)*sw.length);sw.forEach((w,i)=>w.classList.toggle('on',i<n))}
+  const fr=fin.getBoundingClientRect();const fp=clamp((innerHeight-fr.top)/(innerHeight*.9),0,1);$$('.fglass *').forEach(e=>e.style.strokeDashoffset=String(1000*(1-fp)));
+  $$('.card').forEach(c=>{const r=c.getBoundingClientRect();if(r.right<-200||r.left>innerWidth+200)return;const p=(r.left+r.width/2-innerWidth/2)/innerWidth;c.style.transform='translateY('+(Math.abs(p)*26)+'px) rotate('+(p*3)+'deg)';c.querySelector('img').style.transform='translate3d('+(p*-60)+'px,0,0) scale(1.25)'});
+  let cs='';secIds.forEach(id=>{const e=document.getElementById(id);if(e&&e.style.display!=='none'&&e.getBoundingClientRect().top<=innerHeight*.4)cs=id});navLinks.forEach(a=>a.classList.toggle('act',a.getAttribute('href')==='#'+cs));
+  ticking=false;
+}
+addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(onScroll)}},{passive:true});onScroll();
+/* cursor */
+const cur=$('.cursor'),dot=$('.dot');let mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.classList.add('on');dot.classList.add('on');dot.style.transform=`translate(${mx}px,${my}px)`;
+  const g=$('.glow');if(g){const r=$('.hero').getBoundingClientRect();g.style.transform=`translate(${mx-280}px,${my-r.top-280}px)`}});
+(function loop(){cx+=(mx-cx)*.16;cy+=(my-cy)*.16;cur.style.transform=`translate(${cx}px,${cy}px)`;requestAnimationFrame(loop)})();
+$$('a,button,.card,.pillar').forEach(el=>{el.addEventListener('mouseenter',()=>cur.classList.add('big'));el.addEventListener('mouseleave',()=>cur.classList.remove('big'))});
+/* magnetic */
+$$('.magnetic').forEach(el=>{el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();el.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.25}px,${(e.clientY-r.top-r.height/2)*.35}px)`});el.addEventListener('mouseleave',()=>el.style.transform='')});
+/* open now (Fortaleza) */
+(function(){
+  const f=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',weekday:'short',hour:'numeric',minute:'numeric',hour12:false}).formatToParts(new Date());
+  const g=t=>f.find(p=>p.type===t).value;const wd=g('weekday'),h=(+g('hour')%24)+(+g('minute'))/60;
+  const sched={Mon:[9,17],Tue:[9,17],Wed:[9,17],Thu:[9,17],Fri:[9,17],Sat:[9,12]};
+  const s=sched[wd];const open=s&&h>=s[0]&&h<s[1];
+  const el=$('#status');el.classList.toggle('open',!!open);$('span',el).textContent=open?'Aberto agora':'Fechado agora';
+})();
+/* cena da armação */
+(function(){
+  const sc=$('#lente');if(!sc)return;
+  const stk=$('.stk',sc),stage=$('#lstage'),soft=$('#lsoft'),NS='http://www.w3.org/2000/svg';
+  const G=$('#lglasses'),lines=$$('#lline > *'),thick=$('#lthick'),fill=$('#lfill'),shine=$('#lshine'),screw=$('#lscrew'),txt=$('#ltext'),full=$('#lfull'),lc=$$('#lclip .lc'),caps=$$('.lens-scene .cap'),dots=$$('.lens-scene .rail i'),pct=$('.lens-scene .pct'),hint=$('.lens-scene .hint2');
+  const C=(v,a,b)=>Math.min(b,Math.max(a,v)),R=(p,a,b)=>C((p-a)/(b-a),0,1),E=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const set=(el,k,v)=>{if(el._v!==v){el._v=v;el.setAttribute(k,v)}};
+  let last=-1,ci=-1,pc=-1,sig='',tall=false,K=1,VW=1600,ticking=false;
+  /* viewBox e texto conforme o formato da tela: nada fica cortado no celular */
+  function layout(){
+    const w=stk.clientWidth||innerWidth,h=stk.clientHeight||innerHeight;
+    VW=Math.round(900*w/h);tall=VW<1100;K=Math.min(1,VW/(tall?1150:1000));
+    const fs=tall?64:Math.round(132*Math.min(1,VW/1450));
+    const s2=VW+'|'+fs+'|'+tall;if(s2===sig)return false;sig=s2;
+    const vb=(800-VW/2)+' 0 '+VW+' 900';stage.setAttribute('viewBox',vb);soft.setAttribute('viewBox',vb);
+    const L=tall?[['O mundo fica',330],['mais bonito',410],['quando você',510],['enxerga bem.',590]]:[['O mundo fica mais bonito',420],['quando você enxerga bem.',570]];
+    [soft,stage].forEach(sv=>$$('.tx',sv).forEach(g=>{
+      g.textContent='';
+      L.forEach(([t,y],i)=>{const e=document.createElementNS(NS,'text');e.setAttribute('x',800);e.setAttribute('y',y);e.setAttribute('font-size',fs);
+        if(tall?i>1:i===1){e.setAttribute('font-style','italic');if(sv===stage)e.setAttribute('fill','#d2b277')}
+        e.textContent=t;g.appendChild(e)});
+    }));
+    return true;
+  }
+  function upd(){
+    ticking=false;
+    const r=sc.getBoundingClientRect(),tot=sc.offsetHeight-stk.clientHeight;
+    if(r.bottom<-50||r.top>innerHeight+50)return;
+    const p=C(-r.top/tot,0,1);if(Math.abs(p-last)<.0005)return;last=p;
+    const turn=E(R(p,0,.3));
+    lines.forEach((l,i)=>{const k=E(R(p,.02+i*.03,.24+i*.03));l.style.strokeDasharray='1000';l.style.strokeDashoffset=String(1000*(1-k))});
+    const th=E(R(p,.28,.42));set(thick,'opacity',th);set(screw,'opacity',th);
+    lines.forEach(l=>l.style.opacity=String(1-th*.75));
+    set(fill,'opacity',E(R(p,.4,.5)));
+    shine.setAttribute('x',String(-900+R(p,.44,.6)*1300));
+    const tx=E(R(p,.56,.66)),end=E(R(p,.94,1));
+    set(txt,'opacity',tx);soft.style.opacity=String(tx*(1-end));set(full,'opacity',end);
+    const mv=R(p,.62,.94),sw=Math.sin(mv*Math.PI*2);
+    let x=800,y=450,rot=(1-turn)*-14,s=(.55+.45*E(R(p,0,.36)))*K,sx=.25+.75*turn;
+    if(tall){x+=-sw*Math.max(0,(VW-880*K*1.12)/2-6);y+=sw*-125+(1-turn)*60*K}
+    else{x+=-sw*300*K;y+=Math.sin(mv*Math.PI*4)*-40*K+(1-turn)*60*K}
+    rot+=sw*-5;s*=1+end*.12;
+    const T='translate('+x.toFixed(1)+' '+y.toFixed(1)+') rotate('+rot.toFixed(2)+') scale('+(s*sx).toFixed(4)+' '+s.toFixed(4)+')';
+    G.setAttribute('transform',T);lc.forEach(e=>e.setAttribute('transform',T));
+    const c=p<.3?0:p<.48?1:p<.62?2:3,cc=p>.01?c:-1;
+    if(cc!==ci){ci=cc;caps.forEach((e,i)=>e.classList.toggle('on',i===cc));dots.forEach((d,i)=>d.classList.toggle('on',i===c))}
+    const pr=Math.round(p*100);if(pr!==pc){pc=pr;if(pct)pct.textContent=pr+'%'}
+    hint.style.opacity=String(1-R(p,.02,.1));
+  }
+  const tick=()=>{if(!ticking){ticking=true;requestAnimationFrame(upd)}};
+  addEventListener('scroll',tick,{passive:true});
+  addEventListener('resize',()=>{if(layout())last=-1;tick()});
+  layout();upd();
+})();
+/* ===== catálogo ===== */
+const DEFCATS=[{k:'grau',t:'Armações de grau',s:'Para usar todo dia'},{k:'sol',t:'Óculos de sol',s:'Proteção com estilo'},{k:'promocoes',t:'Promoções',s:'Ofertas da casa'},{k:'loja',t:'A loja',s:'Conheça o espaço'}];
+let CATS=DEFCATS.slice();
+const DEFIMG={};[['armacoes','hero1'],['loja','hero2'],['mao','hero3'],['promo','promo'],['close','g4'],['dono','g6']].forEach(([k,sl])=>{const e=$('img[data-slot="'+sl+'"]');if(e)DEFIMG[k]=e.getAttribute('src')});
+const DEFITEMS=[
+ {id:'d1',cat:'grau',name:'Acetato colorido',desc:'Armações em tons de vinho, azul e rosé, para quem gosta de cor.',d:'armacoes'},
+ {id:'d2',cat:'grau',name:'Preta clássica',desc:'Formato marcante que combina com tudo.',d:'close'},
+ {id:'d3',cat:'grau',name:'Leve e discreta',desc:'Para quem quer conforto o dia inteiro.',d:'mao'},
+ {id:'d4',cat:'sol',name:'Solares da vitrine',desc:'Modelos de sol para o dia a dia e para viagens.',d:'loja'},
+ {id:'d5',cat:'promocoes',name:'Compre 1, leve 2',desc:'Óculos de grau ou sol. Consulte as condições na loja.',d:'promo'},
+ {id:'d6',cat:'loja',name:'Nossa vitrine',desc:'Venha experimentar sem pressa.',d:'loja'},
+ {id:'d7',cat:'loja',name:'Atendimento de perto',desc:'Ajuda para escolher a armação certa para o seu rosto.',d:'dono'}];
+const CAT={items:DEFITEMS.slice()},catListeners=[];
+const itemSrc=it=>(it.a&&/^[\w-]+$/.test(it.a))?'/_blob/'+it.a:(DEFIMG[it.d]||'');
+const ofCat=k=>CAT.items.filter(i=>i.cat===k);
+const catT=k=>(CATS.find(c=>c.k===k)||{t:''}).t;
+/* tiles */
+let tilesSeen=false;
+new IntersectionObserver((es,o)=>{if(es.some(e=>e.isIntersecting)){tilesSeen=true;$$('.ctile').forEach(t=>t.classList.add('in'));o.disconnect()}},{threshold:.15}).observe($('.ctiles'));
+function renderTiles(){const wrap=$('.ctiles');wrap.textContent='';CATS.forEach((c,i)=>{const b=document.createElement('button');b.className='ctile reveal'+(tilesSeen?' in':'');b.dataset.cat=c.k;b.style.setProperty('--rd',(i*120)+'ms');b.addEventListener('click',e=>openCat(c.k,e.clientX,e.clientY));wrap.append(b);
+  b.addEventListener('mouseenter',()=>{const cu=$('.cursor');cu&&cu.classList.add('big')});b.addEventListener('mouseleave',()=>{const cu=$('.cursor');cu&&cu.classList.remove('big')});
+  const k=c.k,l=ofCat(k);
+  const im=document.createElement('img');im.alt='';if(l[0])im.src=itemSrc(l[0]);b.append(im);
+  const ct=document.createElement('div');ct.className='ct';const sm=document.createElement('small');sm.textContent=l.length+(l.length===1?' opção':' opções');
+  const h=document.createElement('h3');h.textContent=c.t;const p=document.createElement('p');p.textContent=c.s;const g=document.createElement('span');g.className='go';g.textContent='Ver opções →';ct.append(sm,h,p,g);b.append(ct)})}
+/* modal */
+const M=document.createElement('div');M.className='cmodal';
+M.innerHTML='<div class="cm-bg"></div><div class="cm-box" role="dialog" aria-modal="true" aria-label="Coleção"><div class="cm-head"><div><small>Coleção Speculari</small><h3 class="cm-title"></h3></div><button class="cm-x" aria-label="Fechar">×</button></div><div class="cm-tabs"></div><div class="cm-grid"></div>'+
+ '<div class="cm-detail"><div class="cm-dimg"><img alt=""></div><div class="cm-dtxt"><button class="cm-back">← Voltar às opções</button><small class="cm-dcat"></small><h3 class="cm-dname"></h3><p class="cm-ddesc"></p><a class="btn cm-cta" href="https://wa.me/5585996409091?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Speculari%20%C3%93tica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener"><span>Tenho interesse</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><div class="cm-nav"><button class="cm-prev" aria-label="Anterior">‹</button><span class="cm-pos"></span><button class="cm-next" aria-label="Próximo">›</button></div></div></div></div>';
+document.body.append(M);
+let curCat='grau',curIdx=-1;
+function renderModal(){
+  $('.cm-title',M).textContent=catT(curCat);
+  const tabs=$('.cm-tabs',M);tabs.textContent='';
+  CATS.forEach(c=>{const b=document.createElement('button');b.className=c.k===curCat?'on':'';b.textContent=c.t+' ('+ofCat(c.k).length+')';b.onclick=()=>{curCat=c.k;closeDetail();renderModal();setHash()};tabs.append(b)});
+  const g=$('.cm-grid',M);g.textContent='';const l=ofCat(curCat);
+  if(!l.length){const e=document.createElement('p');e.className='cm-empty';e.textContent='Nenhum modelo nesta categoria ainda.';g.append(e)}
+  l.forEach((it,i)=>{const f=document.createElement('button');f.className='cm-item';f.style.setProperty('--i',i);
+    const w=document.createElement('div');w.className='cm-iw';const im=document.createElement('img');im.alt='';im.src=itemSrc(it);w.append(im);
+    const cap=document.createElement('div');cap.className='cm-cap';const b=document.createElement('b');b.textContent=it.name||'Modelo';const s=document.createElement('span');s.textContent='Ver detalhes +';cap.append(b,s);
+    f.append(w,cap);f.onclick=()=>showDetail(i);g.append(f)});
+  if(curIdx>=0)fillDetail();
+}
+function fillDetail(){const l=ofCat(curCat);if(!l.length){closeDetail();return}curIdx=Math.min(curIdx,l.length-1);const it=l[curIdx];
+  const im=$('.cm-dimg img',M);im.src=itemSrc(it);im.style.animation='none';void im.offsetWidth;im.style.animation='';
+  $('.cm-dcat',M).textContent=catT(curCat);$('.cm-dname',M).textContent=it.name||'Modelo';$('.cm-ddesc',M).textContent=it.desc||'';
+  $('.cm-pos',M).textContent=(curIdx+1)+' / '+l.length;$('.cm-cta',M).href='https://wa.me/5585996409091?text='+encodeURIComponent('Olá! Vi no site da Speculari Ótica o modelo "'+(it.name||'')+'" ('+catT(curCat)+') e gostaria de saber mais.');const t=$('.cm-dtxt',M);t.style.animation='none';void t.offsetWidth;t.style.animation=''}
+function showDetail(i){curIdx=i;fillDetail();M.classList.add('detail')}
+function closeDetail(){curIdx=-1;M.classList.remove('detail')}
+const step=d=>{const n=ofCat(curCat).length;if(!n)return;curIdx=(curIdx+d+n)%n;fillDetail()};
+function setHash(){try{history.replaceState(null,'','#colecao-'+curCat)}catch(e){}}
+function openCat(k,x,y){if(!CATS.some(c=>c.k===k))k=CATS[0]?CATS[0].k:'';curCat=k;closeDetail();renderModal();
+  const r=$('.cm-box',M).getBoundingClientRect();M.style.setProperty('--ox',((x??innerWidth/2)-r.left)+'px');M.style.setProperty('--oy',((y??innerHeight/2)-r.top)+'px');
+  M.classList.add('open');document.body.classList.add('pop','mopen');document.documentElement.style.overflow='hidden';setHash()}
+function closeModal(){M.classList.remove('open','detail');curIdx=-1;document.body.classList.remove('mopen');if(!$('.panel.open'))document.body.classList.remove('pop');document.documentElement.style.overflow='';
+  try{if(location.hash.startsWith('#colecao-'))history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
+$('.cm-x',M).onclick=closeModal;$('.cm-bg',M).onclick=closeModal;$('.cm-back',M).onclick=closeDetail;$('.cm-prev',M).onclick=()=>step(-1);$('.cm-next',M).onclick=()=>step(1);
+addEventListener('keydown',e=>{if(!M.classList.contains('open'))return;if(e.key==='Escape'){M.classList.contains('detail')?closeDetail():closeModal()}else if(M.classList.contains('detail')&&e.key==='ArrowRight')step(1);else if(M.classList.contains('detail')&&e.key==='ArrowLeft')step(-1)});
+$$('.card[data-cat]').forEach(c=>c.addEventListener('click',e=>openCat(c.dataset.cat,e.clientX,e.clientY)));
+const hashOpen=()=>{const m=location.hash.match(/^#colecao-([a-z0-9-]+)$/);if(m&&!M.classList.contains('open'))openCat(m[1])};
+addEventListener('hashchange',hashOpen);
+function catChanged(){renderTiles();if(M.classList.contains('open')){if(!CATS.some(c=>c.k===curCat))curCat=CATS[0]?CATS[0].k:'';renderModal()}catListeners.forEach(f=>f())}
+renderTiles();hashOpen();
+(async()=>{const cdb=(window.claude&&window.claude.use)?await window.claude.use('db'):null;if(!cdb)return;
+  cdb.doc('site/catalog').onSnapshot(s=>{const d=s.exists?s.data():null;CAT.items=(d&&Array.isArray(d.items))?d.items.filter(x=>x&&typeof x==='object'):DEFITEMS.slice();const okc=d&&Array.isArray(d.cats)?d.cats.filter(c=>c&&typeof c.k==='string'&&/^[a-z0-9-]+$/.test(c.k)&&typeof c.t==='string'):null;CATS=okc&&okc.length?okc:DEFCATS.slice();catChanged()},()=>{})})();
+
+
+})();
+</script>
+</body>
+</html>
